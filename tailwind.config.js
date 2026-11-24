@@ -1,10 +1,17 @@
 /* eslint-disable */
+const fs = require("fs");
 const path = require("path");
 
 const config = require("./libs/components/tailwind.config.base");
 const webConfig = require("./apps/web/tailwind.config");
-const browserConfig = require("./apps/browser/tailwind.config");
-const desktopConfig = require("./apps/desktop/tailwind.config");
+const browserConfigPath = path.resolve(__dirname, "apps/browser/tailwind.config.js");
+const desktopConfigPath = path.resolve(__dirname, "apps/desktop/tailwind.config.js");
+const browserConfig = fs.existsSync(browserConfigPath)
+  ? require(browserConfigPath)
+  : { browserContent: [] };
+const desktopConfig = fs.existsSync(desktopConfigPath)
+  ? require(desktopConfigPath)
+  : { desktopContent: [] };
 
 /**
  * Pull together all the tailwind configs for the shared libs and clients for use in Storybook.

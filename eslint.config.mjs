@@ -458,6 +458,7 @@ export default tseslint.config(
             "tw-app-region*", // Custom utility for native passkey modals
             "tw-@container",
             "vw-.*",
+            "ky-.*",
           ],
         },
       ],
