@@ -9,13 +9,9 @@ import { Organization } from "@bitwarden/common/admin-console/models/domain/orga
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { getUserId } from "@bitwarden/common/auth/services/account.service";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
-import { DialogService, SideNavService } from "@bitwarden/components";
+import { DialogService } from "@bitwarden/components";
 import { LogService } from "@bitwarden/logging";
-import {
-  CoachmarkService,
-  NewExperienceDialogService,
-  VaultItemsTransferService,
-} from "@bitwarden/vault";
+import { CoachmarkService, VaultItemsTransferService } from "@bitwarden/vault";
 
 import {
   AutoConfirmPolicy,
@@ -23,15 +19,7 @@ import {
 } from "../../admin-console/organizations/policies";
 import { UnifiedUpgradePromptService } from "../../billing/individual/upgrade/services";
 
-import { WebVaultExtensionPromptService } from "./web-vault-extension-prompt.service";
 import { WelcomeDialogService } from "./welcome-dialog.service";
-
-/**
- * Screenshots of the redesigned vault, shown in the new experience dialog. Relative to the
- * document, which webpack emits alongside the copied `images` directory.
- */
-const NEW_EXPERIENCE_LIGHT_IMG = "images/new-experience/new-experience.light.png";
-const NEW_EXPERIENCE_DARK_IMG = "images/new-experience/new-experience.dark.png";
 
 @Injectable()
 export class WebVaultPromptService {
@@ -44,10 +32,7 @@ export class WebVaultPromptService {
   private organizationService = inject(OrganizationService);
   private dialogService = inject(DialogService);
   private logService = inject(LogService);
-  private webVaultExtensionPromptService = inject(WebVaultExtensionPromptService);
   private welcomeDialogService = inject(WelcomeDialogService);
-  private newExperienceDialogService = inject(NewExperienceDialogService);
-  private sideNavService = inject(SideNavService);
   private coachmarkService = inject(CoachmarkService);
 
   private userId$ = this.accountService.activeAccount$.pipe(getUserId);
@@ -83,22 +68,9 @@ export class WebVaultPromptService {
       return;
     }
 
-    // A user who was just welcomed to Bitwarden is not also told what changed about it.
-    if (await this.welcomeDialogService.conditionallyShowWelcomeDialog()) {
-      return;
-    }
-
-    if (
-      await this.newExperienceDialogService.conditionallyOpen(userId, {
-        lightImgSrc: NEW_EXPERIENCE_LIGHT_IMG,
-        darkImgSrc: NEW_EXPERIENCE_DARK_IMG,
-      })
-    ) {
-      this.sideNavService.open.set(true);
-      return;
-    }
-
-    await this.webVaultExtensionPromptService.conditionallyPromptUserForExtension(userId);
+    // Show the KyVault welcome dialog for new accounts, skipping upstream Bitwarden
+    // redesign announcements and browser-extension nag dialogs.
+    await this.welcomeDialogService.conditionallyShowWelcomeDialog();
   }
 
   private openAutoConfirmFeatureDialog(organization: Organization) {

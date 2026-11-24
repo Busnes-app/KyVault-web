@@ -22,7 +22,6 @@ const NEW_USER_TOUR_STEPS: CoachmarkStep[] = [
     titleKey: "coachmarkImportTitle",
     descriptionKey: "coachmarkImportDescription",
     position: "right-center",
-    learnMoreUrl: "https://bitwarden.com/help/import-data/",
     route: "/tools/import",
     // VFO1 drops the Import nav entry — import is a dialog opened from the vault toolbar, so the
     // step anchors that button rather than the import page.
@@ -33,7 +32,6 @@ const NEW_USER_TOUR_STEPS: CoachmarkStep[] = [
     titleKey: "coachmarkAddItemTitle",
     descriptionKey: "coachmarkAddItemDescription",
     position: "below-center",
-    learnMoreUrl: "https://bitwarden.com/help/managing-items/",
     route: "/vault",
   },
   {
@@ -42,7 +40,6 @@ const NEW_USER_TOUR_STEPS: CoachmarkStep[] = [
     descriptionKey: "coachmarkShareWithCollectionsDescription",
     descriptionKeyVfo1: "coachmarkShareWithSharedFoldersDescription",
     position: "right-center",
-    learnMoreUrl: "https://bitwarden.com/help/about-collections/",
     requiresOrganization: true,
     requiresCollections: true,
     route: "/vault",
@@ -53,7 +50,6 @@ const NEW_USER_TOUR_STEPS: CoachmarkStep[] = [
     titleKey: "coachmarkMonitorSecurityTitle",
     descriptionKey: "coachmarkMonitorSecurityDescription",
     position: "right-center",
-    learnMoreUrl: "https://bitwarden.com/help/reports/",
     route: "/reports",
     opensSideNav: true,
   },
