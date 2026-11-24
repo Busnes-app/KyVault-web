@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-/// Ensure that `sdk-internal` and `commercial-sdk-internal` dependencies have matching versions.
+/// Ensure OSS `@bitwarden/sdk-internal` is pinned and commercial SDK is never added.
 
 import fs from "fs";
 import path from "path";
@@ -10,13 +10,22 @@ const packageJson = JSON.parse(
 );
 
 const sdkInternal = packageJson.dependencies["@bitwarden/sdk-internal"];
-const commercialSdkInternal = packageJson.dependencies["@bitwarden/commercial-sdk-internal"];
+const commercialSdkInternal =
+  packageJson.dependencies["@bitwarden/commercial-sdk-internal"] ??
+  packageJson.devDependencies?.["@bitwarden/commercial-sdk-internal"];
 
-if (sdkInternal !== commercialSdkInternal) {
+if (!sdkInternal) {
+  console.error("Missing required OSS dependency @bitwarden/sdk-internal.");
+  process.exit(1);
+}
+
+if (commercialSdkInternal) {
   console.error(
-    `Version mismatch between @bitwarden/sdk-internal (${sdkInternal}) and @bitwarden/commercial-sdk-internal (${commercialSdkInternal}), must be an exact match.`,
+    `Restricted dependency @bitwarden/commercial-sdk-internal (${commercialSdkInternal}) must not be present in the OSS fork.`,
   );
   process.exit(1);
 }
 
-console.log(`All dependencies have matching versions: ${sdkInternal}`);
+console.log(
+  `OSS SDK dependency verified: @bitwarden/sdk-internal@${sdkInternal} (commercial SDK excluded)`,
+);
