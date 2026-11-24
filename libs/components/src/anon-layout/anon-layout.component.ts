@@ -18,6 +18,7 @@ import { EnvironmentService } from "@bitwarden/common/platform/abstractions/envi
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import { I18nPipe } from "@bitwarden/ui-common";
 
+import { KyAboutTriggerComponent, KyAuthThemeSelectComponent } from "../ky-busnes";
 import {
   ContentVerticalPaddingType,
   FooterVerticalPaddingType,
@@ -37,7 +38,16 @@ export type SecondaryContentLocationType = "main" | "footer";
 @Component({
   selector: "auth-anon-layout",
   templateUrl: "./anon-layout.component.html",
-  imports: [CommonModule, I18nPipe, SvgModule, TypographyModule, RouterModule, LandingLayoutModule],
+  imports: [
+    CommonModule,
+    I18nPipe,
+    SvgModule,
+    TypographyModule,
+    RouterModule,
+    LandingLayoutModule,
+    KyAboutTriggerComponent,
+    KyAuthThemeSelectComponent,
+  ],
 })
 export class AnonLayoutComponent implements OnInit, OnChanges {
   @HostBinding("class")

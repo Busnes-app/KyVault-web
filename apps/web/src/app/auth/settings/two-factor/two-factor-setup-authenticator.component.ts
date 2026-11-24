@@ -244,11 +244,11 @@ export class TwoFactorSetupAuthenticatorComponent
     new window.QRious({
       element: document.getElementById("qr"),
       value:
-        "otpauth://totp/Vaultwarden:" +
+        "otpauth://totp/KyVault:" +
         Utils.encodeRFC3986URIComponent(email) +
         "?secret=" +
         encodeURIComponent(this.key) +
-        "&issuer=Vaultwarden",
+        "&issuer=KyVault",
       size: 160,
     });
   }

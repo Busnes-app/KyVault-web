@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from "@angular/core";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { FormBuilder } from "@angular/forms";
 import { filter, firstValueFrom, switchMap } from "rxjs";
@@ -7,9 +7,8 @@ import { DomainSettingsService } from "@bitwarden/common/autofill/services/domai
 import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
-import { Theme, ThemeTypes } from "@bitwarden/common/platform/enums";
 import { Utils } from "@bitwarden/common/platform/misc/utils";
-import { ThemeStateService } from "@bitwarden/common/platform/theming/theme-state.service";
+import { KY_THEME_CHOICE_GROUPS, KyThemeChoice } from "@bitwarden/common/platform/theming/ky-theme";
 import { BreadcrumbsModule } from "@bitwarden/components";
 import {
   PermitCipherDetailsPopoverComponent,
@@ -17,17 +16,13 @@ import {
   ShowQuickCopyActionsDetailsPopoverComponent,
 } from "@bitwarden/vault";
 
+import { KyThemeService } from "../core/ky-theme.service";
 import { HeaderModule } from "../layouts/header/header.module";
 import { SharedModule } from "../shared";
 
 type LocaleOption = {
   name: string;
   value: string | null;
-};
-
-type ThemeOption = {
-  name: string;
-  value: Theme;
 };
 
 @Component({
@@ -43,8 +38,10 @@ type ThemeOption = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppearanceComponent implements OnInit {
+  protected readonly kyThemeService = inject(KyThemeService);
+  protected readonly themeChoiceGroups = KY_THEME_CHOICE_GROUPS;
+
   readonly localeOptions: LocaleOption[];
-  readonly themeOptions: ThemeOption[];
 
   protected readonly showBreadcrumbs = toSignal(
     this.configService.getFeatureFlag$(FeatureFlag.VFO1Foundation),
@@ -53,7 +50,6 @@ export class AppearanceComponent implements OnInit {
 
   readonly form = this.formBuilder.group({
     enableFavicons: true,
-    theme: [ThemeTypes.Light as Theme],
     locale: [null as string | null],
     showQuickCopyActions: false,
   });
@@ -61,7 +57,6 @@ export class AppearanceComponent implements OnInit {
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly i18nService: I18nService,
-    private readonly themeStateService: ThemeStateService,
     private readonly domainSettingsService: DomainSettingsService,
     private readonly configService: ConfigService,
     private readonly vaultCopyButtonsService: VaultCopyButtonsService,
@@ -78,18 +73,12 @@ export class AppearanceComponent implements OnInit {
     localeOptions.sort(Utils.getSortFunction(i18nService, "name"));
     localeOptions.splice(0, 0, { name: i18nService.t("default"), value: null });
     this.localeOptions = localeOptions;
-    this.themeOptions = [
-      { name: i18nService.t("themeLight"), value: ThemeTypes.Light },
-      { name: i18nService.t("themeDark"), value: ThemeTypes.Dark },
-      { name: i18nService.t("themeSystem"), value: ThemeTypes.System },
-    ];
   }
 
   async ngOnInit() {
     this.form.setValue(
       {
         enableFavicons: await firstValueFrom(this.domainSettingsService.showFavicons$),
-        theme: await firstValueFrom(this.themeStateService.selectedTheme$),
         locale: (await firstValueFrom(this.i18nService.userSetLocale$)) ?? null,
         showQuickCopyActions: await firstValueFrom(
           this.vaultCopyButtonsService.showQuickCopyActions$,
@@ -103,16 +92,6 @@ export class AppearanceComponent implements OnInit {
         filter((enableFavicons) => enableFavicons != null),
         switchMap(async (enableFavicons) => {
           await this.domainSettingsService.setShowFavicons(enableFavicons);
-        }),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe();
-
-    this.form.controls.theme.valueChanges
-      .pipe(
-        filter((theme) => theme != null),
-        switchMap(async (theme) => {
-          await this.themeStateService.setSelectedTheme(theme);
         }),
         takeUntilDestroyed(this.destroyRef),
       )
@@ -137,5 +116,9 @@ export class AppearanceComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe();
+  }
+
+  protected async selectTheme(choice: KyThemeChoice): Promise<void> {
+    await this.kyThemeService.setChoice(choice);
   }
 }

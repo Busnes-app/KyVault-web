@@ -1,6 +1,9 @@
 <bit-landing-layout [hideBackgroundIllustration]="hideBackgroundIllustration()">
   <bit-landing-header [hideLogo]="hideLogo()">
-    <ng-content select="[slot=header-actions]"></ng-content>
+    <div class="tw-flex tw-items-center tw-gap-3">
+      <ng-content select="[slot=header-actions]"></ng-content>
+      <ky-auth-theme-select></ky-auth-theme-select>
+    </div>
   </bit-landing-header>
 
   <bit-landing-content [maxWidth]="maxWidth()" [contentVerticalPadding]="contentVerticalPadding()">
@@ -40,13 +43,12 @@
       </div>
 
       @if (!hideYearAndVersion) {
-        <div bitTypography="body2">Vaultwarden Web</div>
-        <div bitTypography="body2">{{ version }}</div>
-        <br />
-        <div bitTypography="helper" id="vw-disclaimer">
-          A modified version of the Bitwarden&reg; Web Vault for Vaultwarden (an unofficial rewrite
-          of the Bitwarden&reg; server).<br />
-          Vaultwarden is not associated with the Bitwarden&reg; project nor Bitwarden Inc.
+        <div
+          class="tw-mt-4 tw-flex tw-items-center tw-justify-center tw-gap-2 tw-text-xs tw-text-muted"
+        >
+          <span>KyVault</span>
+          <span aria-hidden="true">·</span>
+          <ky-about-trigger label="License" [version]="version"></ky-about-trigger>
         </div>
       }
     </bit-landing-footer>

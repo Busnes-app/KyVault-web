@@ -2,6 +2,7 @@ import { Inject, Injectable } from "@angular/core";
 import { fromEvent, map, merge, Observable, of, Subscription, switchMap } from "rxjs";
 
 import { ThemeTypes, Theme } from "@bitwarden/common/platform/enums";
+import { applyKyTheme, readStoredKyTheme } from "@bitwarden/common/platform/theming/ky-theme";
 import { ThemeStateService } from "@bitwarden/common/platform/theming/theme-state.service";
 
 import { SYSTEM_THEME_OBSERVABLE } from "../../../services/injection-tokens";
@@ -56,11 +57,8 @@ export class AngularThemingService implements AbstractThemingService {
 
   applyThemeChangesTo(document: Document): Subscription {
     return this.theme$.subscribe((theme) => {
-      document.documentElement.classList.remove(
-        "theme_" + ThemeTypes.Light,
-        "theme_" + ThemeTypes.Dark,
-      );
-      document.documentElement.classList.add("theme_" + theme);
+      const dark = theme === ThemeTypes.Dark;
+      applyKyTheme(readStoredKyTheme(), document.documentElement, dark);
     });
   }
 }

@@ -1,0 +1,1138 @@
+/* ============================================================================
+ * KyVault — Busnes.app Design System & @busnes/ky-ui v0.12.0 Token Bridge
+ * ============================================================================ */
+
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("../fonts/SpaceGrotesk-VariableFont_wght.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/IBMPlexMono-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../fonts/IBMPlexMono-Medium.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../fonts/IBMPlexMono-SemiBold.ttf") format("truetype");
+}
+
+/* ---------- @busnes/ky-ui v0.12.0 Geometry & Status Tokens ---------- */
+:root {
+  --ky-type-title: 1.5rem;
+  --ky-type-section: 1.0625rem;
+  --ky-type-body: 0.9375rem;
+  --ky-type-nav: 0.875rem;
+  --ky-type-meta: 0.8125rem;
+  --ky-text-label: 0.8125rem;
+  --ky-space-1: 0.25rem;
+  --ky-space-2: 0.5rem;
+  --ky-space-3: 1rem;
+  --ky-space-4: 1.5rem;
+  --ky-space-5: 2rem;
+  --ky-control-size: 2.5rem;
+  --ky-control-radius: 0.5rem;
+  --ky-radius: 10px;
+  --ky-sidebar-size: 15rem;
+  --ky-content-inset: var(--ky-space-5);
+  --ky-content-max: 72rem;
+  --ky-shadow-overlay: 0 18px 48px rgb(0 0 0 / 0.26), 0 2px 8px rgb(0 0 0 / 0.12);
+
+  --ky-font-sans:
+    "Space Grotesk", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --ky-font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+
+  --font-sans: var(--ky-font-sans);
+  --font-mono: var(--ky-font-mono);
+
+  /* Semantic status colours — never borrow accent (#bf3f18) */
+  --ky-danger-light: #a8174e;
+  --ky-danger-dark: #ff8fb1;
+  --ky-success-light: #267442;
+  --ky-success-dark: #86efac;
+  --ky-warning-light: #7a5f00;
+  --ky-warning-dark: #ffd25e;
+
+  /* Busnes Light defaults (overridden dynamically by ky-theme.ts for all 12 halves) */
+  --bg: #f8f6f0;
+  --panel: #ffffff;
+  --panel-hover: #f2efe7;
+  --ink: #566461;
+  --ink-strong: #182326;
+  --ink-muted: #566461;
+  --accent: #bf3f18;
+  --accent-soft: #fbf0ec;
+  --line: rgba(24, 35, 38, 0.22);
+  --line-strong: rgba(24, 35, 38, 0.38);
+  --glow: transparent;
+  --sidebar-start: #f2efe7;
+  --sidebar-end: #f2efe7;
+  --button-text: #ffffff;
+  --danger: var(--ky-danger-light);
+  --success: var(--ky-success-light);
+  --warning: var(--ky-warning-light);
+
+  /* Busnes Light fallback RGB triplets */
+  --ky-bg-rgb: 248 246 240;
+  --ky-panel-rgb: 255 255 255;
+  --ky-panel-hover-rgb: 242 239 231;
+  --ky-ink-rgb: 86 100 97;
+  --ky-ink-strong-rgb: 24 35 38;
+  --ky-accent-rgb: 191 63 24;
+  --ky-accent-hover-rgb: 164 58 26;
+  --ky-accent-soft-rgb: 251 240 236;
+  --ky-accent-300-rgb: 220 150 128;
+  --ky-line-rgb: 204 202 195;
+  --ky-line-strong-rgb: 163 165 162;
+  --ky-button-text-rgb: 255 255 255;
+  --ky-danger-rgb: 168 23 78;
+  --ky-danger-hover-rgb: 145 25 71;
+  --ky-danger-soft-rgb: 243 222 230;
+  --ky-success-rgb: 38 116 66;
+  --ky-success-hover-rgb: 36 103 61;
+  --ky-success-soft-rgb: 225 236 229;
+  --ky-warning-rgb: 122 95 0;
+  --ky-warning-hover-rgb: 106 85 6;
+  --ky-warning-soft-rgb: 234 229 214;
+
+  --ky-field-border: color-mix(in srgb, var(--ink-strong) 45%, var(--bg));
+  --ky-danger-soft: color-mix(in srgb, var(--danger) 12%, var(--panel));
+  --ky-warning-soft: color-mix(in srgb, var(--warning) 12%, var(--panel));
+  --ky-success-soft: color-mix(in srgb, var(--success) 12%, var(--panel));
+}
+
+@media (max-width: 720px) {
+  :root {
+    --ky-content-inset: var(--ky-space-3);
+  }
+}
+
+/* ---------- Bitwarden Legacy & Semantic Token Bridge ----------
+ * Maps every Bitwarden Tailwind utility and component token onto the active
+ * Busnes palette (all 6 pairs / 12 halves). Higher specificity than :root / .theme_dark
+ * in tw-theme.css ensures zero blue Bitwarden bleed in any palette.
+ */
+:root.theme_light,
+:root.theme_dark,
+:root[data-ky-theme] {
+  /* Legacy space-separated RGB tokens (consumed via rgb(var(--color-*) / <alpha>)) */
+  --color-primary-100: var(--ky-accent-soft-rgb);
+  --color-primary-300: var(--ky-accent-300-rgb);
+  --color-primary-500: var(--ky-accent-rgb);
+  --color-primary-600: var(--ky-accent-rgb);
+  --color-primary-700: var(--ky-accent-hover-rgb);
+
+  --color-secondary-100: var(--ky-line-rgb);
+  --color-secondary-300: var(--ky-line-rgb);
+  --color-secondary-500: var(--ky-line-strong-rgb);
+  --color-secondary-600: var(--ky-ink-rgb);
+  --color-secondary-700: var(--ky-ink-strong-rgb);
+
+  --color-danger-100: var(--ky-danger-soft-rgb);
+  --color-danger-600: var(--ky-danger-rgb);
+  --color-danger-700: var(--ky-danger-hover-rgb);
+
+  --color-success-100: var(--ky-success-soft-rgb);
+  --color-success-600: var(--ky-success-rgb);
+  --color-success-700: var(--ky-success-hover-rgb);
+
+  --color-warning-100: var(--ky-warning-soft-rgb);
+  --color-warning-600: var(--ky-warning-rgb);
+  --color-warning-700: var(--ky-warning-hover-rgb);
+
+  --color-info-100: var(--ky-accent-soft-rgb);
+  --color-info-600: var(--ky-accent-rgb);
+  --color-info-700: var(--ky-accent-hover-rgb);
+
+  --color-notification-100: var(--ky-accent-soft-rgb);
+  --color-notification-600: var(--ky-accent-rgb);
+
+  --color-text-main: var(--ky-ink-strong-rgb);
+  --color-text-muted: var(--ky-ink-rgb);
+  --color-text-contrast: var(--ky-button-text-rgb);
+  --color-text-alt2: var(--ky-accent-rgb);
+  --color-text-code: var(--ky-danger-rgb);
+
+  --color-background: var(--ky-panel-rgb);
+  --color-background-alt: var(--ky-bg-rgb);
+  --color-background-alt2: var(--ky-sidebar-rgb, var(--ky-panel-hover-rgb));
+  --color-background-alt3: var(--ky-panel-hover-rgb);
+  --color-background-alt4: var(--ky-accent-rgb);
+  --color-hover-default: var(--ky-panel-hover-rgb);
+  --color-hover-contrast: var(--ky-button-text-rgb);
+
+  /* Semantic Figma tokens (direct CSS colors) */
+  --color-bg-white: var(--panel);
+  --color-bg-dark: var(--ink-strong);
+  --color-bg-primary: var(--panel);
+  --color-bg-secondary: var(--bg);
+  --color-bg-tertiary: var(--bg);
+  --color-bg-quaternary: var(--panel-hover);
+  --color-bg-gray: var(--panel-hover);
+  --color-bg-gray-strong: var(--line);
+  --color-bg-inactive: var(--panel-hover);
+  --color-bg-contrast: var(--ink-strong);
+  --color-bg-contrast-soft: color-mix(in srgb, var(--ink-strong) 10%, var(--panel));
+  --color-bg-contrast-strong: var(--ink-strong);
+
+  --color-bg-brand-softer: var(--accent-soft);
+  --color-bg-brand-soft: var(--accent-soft);
+  --color-bg-brand-medium: color-mix(in srgb, var(--accent) 26%, var(--panel));
+  --color-bg-brand: var(--accent);
+  --color-bg-brand-strong: color-mix(in srgb, var(--accent) 86%, var(--ink-strong));
+  --color-bg-brand-stronger: color-mix(in srgb, var(--accent) 76%, var(--ink-strong));
+  --color-brand-950: var(--sidebar-start);
+
+  --color-bg-danger-soft: var(--ky-danger-soft);
+  --color-bg-danger-medium: color-mix(in srgb, var(--danger) 24%, var(--panel));
+  --color-bg-danger: var(--danger);
+  --color-bg-danger-strong: color-mix(in srgb, var(--danger) 85%, var(--ink-strong));
+
+  --color-bg-success-soft: var(--ky-success-soft);
+  --color-bg-success-medium: color-mix(in srgb, var(--success) 24%, var(--panel));
+  --color-bg-success: var(--success);
+  --color-bg-success-strong: color-mix(in srgb, var(--success) 85%, var(--ink-strong));
+
+  --color-bg-warning-soft: var(--ky-warning-soft);
+  --color-bg-warning-medium: color-mix(in srgb, var(--warning) 24%, var(--panel));
+  --color-bg-warning: var(--warning);
+  --color-bg-warning-strong: color-mix(in srgb, var(--warning) 85%, var(--ink-strong));
+
+  --color-bg-info-soft: var(--accent-soft);
+  --color-bg-info-medium: color-mix(in srgb, var(--accent) 24%, var(--panel));
+  --color-bg-info: var(--accent);
+  --color-bg-info-strong: color-mix(in srgb, var(--accent) 85%, var(--ink-strong));
+
+  --color-fg-heading: var(--ink-strong);
+  --color-fg-primary: var(--ink-strong);
+  --color-fg-secondary: var(--ink);
+  --color-fg-tertiary: var(--ink-muted);
+  --color-fg-brand: var(--accent);
+  --color-fg-brand-strong: color-mix(in srgb, var(--accent) 86%, var(--ink-strong));
+  --color-fg-contrast: var(--button-text);
+  --color-fg-white: var(--button-text);
+  --color-fg-dark: var(--ink-strong);
+  --color-fg-danger: var(--danger);
+  --color-fg-danger-strong: color-mix(in srgb, var(--danger) 86%, var(--ink-strong));
+  --color-fg-success: var(--success);
+  --color-fg-warning: var(--warning);
+  --color-fg-info: var(--accent);
+  --color-fg-disabled: color-mix(in srgb, var(--ink) 55%, var(--bg));
+
+  --color-border-base: var(--line);
+  --color-border-subtle: var(--line);
+  --color-border-muted: var(--line);
+  --color-border-strong: var(--line-strong);
+  --color-border-brand: var(--accent);
+  --color-border-brand-soft: color-mix(in srgb, var(--accent) 35%, transparent);
+  --color-border-danger: var(--danger);
+  --color-border-success: var(--success);
+  --color-border-warning: var(--warning);
+  --color-border-focus: var(--accent);
+  --color-border-nav-divider: var(--line);
+
+  --color-transparent-hover: color-mix(in srgb, var(--ink-strong) 8%, transparent);
+
+  /* Navigation tokens (both default & vfo1) */
+  --color-nav-bg-brand: var(--sidebar-start);
+  --color-nav-bg-brand-soft: var(--accent-soft);
+  --color-nav-bg-brand-hover: var(--panel-hover);
+  --color-nav-bg-admin: var(--sidebar-start);
+  --color-nav-bg-admin-soft: var(--accent-soft);
+  --color-nav-bg-admin-hover: var(--panel-hover);
+
+  --color-nav-fg-primary: var(--ink-strong);
+  --color-nav-bg-primary: var(--sidebar-start);
+  --color-nav-bg-primary-strong: var(--accent-soft);
+  --color-nav-bg-primary-hover: var(--panel-hover);
+  --color-nav-bg-primary-hover-strong: var(--accent-soft);
+  --color-nav-border-primary: var(--line);
+  --color-nav-border-primary-focus: var(--accent);
+
+  --color-nav-fg-secondary: var(--ink-strong);
+  --color-nav-bg-secondary: var(--sidebar-start);
+  --color-nav-bg-secondary-strong: var(--accent-soft);
+  --color-nav-bg-secondary-hover: var(--panel-hover);
+  --color-nav-bg-secondary-hover-strong: var(--accent-soft);
+  --color-nav-border-secondary: var(--line);
+  --color-nav-border-secondary-focus: var(--accent);
+
+  --color-nav-fg: var(--ink-strong);
+  --color-nav-bg: var(--sidebar-start);
+  --color-nav-bg-hover: var(--panel-hover);
+}
+
+/* Override Bitwarden's [data-nav-version="default"] local re-scoping in tw-theme.css */
+[data-nav-version="default"],
+[data-nav-version="vfo1"] {
+  --color-bg-nav: var(--sidebar-start) !important;
+  --color-bg-nav-hover: var(--panel-hover) !important;
+  --color-fg-nav: var(--ink-strong) !important;
+  --color-border-nav-divider: var(--line) !important;
+  --color-border-nav-focus: var(--accent) !important;
+  --color-nav-bg-primary: var(--sidebar-start);
+  --color-nav-bg-primary-strong: var(--accent-soft);
+  --color-nav-bg-primary-hover: var(--panel-hover);
+  --color-nav-bg-primary-hover-strong: var(--accent-soft);
+  --color-nav-fg-primary: var(--ink-strong);
+  --color-nav-border-primary: var(--line);
+  --color-nav-border-primary-focus: var(--accent);
+}
+
+/* ---------- Typography & Browser Surface Polish ---------- */
+html,
+body {
+  font-family: var(--ky-font-sans);
+  background-color: var(--bg);
+  color: var(--ink-strong);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+code,
+pre,
+kbd,
+samp,
+.tw-font-mono {
+  font-family: var(--ky-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 26%, transparent);
+  color: var(--ink-strong);
+}
+
+input,
+textarea {
+  caret-color: var(--accent);
+}
+
+* {
+  scrollbar-color: var(--line-strong) transparent;
+  scrollbar-width: thin;
+}
+
+/* ---------- Busnes Sidebar & Navigation Shell ---------- */
+#bit-side-nav {
+  background: linear-gradient(180deg, var(--sidebar-start), var(--sidebar-end)) !important;
+  border-right: 1px solid var(--line);
+  color: var(--ink-strong);
+}
+
+#bit-side-nav [data-testid="nav-item-container"] {
+  border-radius: var(--ky-control-radius) !important;
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+/* Active nav item: Busnes 3px left accent bar + soft tint, icon color unchanged */
+#bit-side-nav [data-testid="nav-item-container"]:has([aria-current="page"]),
+#bit-side-nav [data-testid="nav-item-container"]:has(.active) {
+  background-color: var(--accent-soft) !important;
+  box-shadow: inset 3px 0 var(--accent);
+}
+
+#bit-side-nav [data-testid="nav-item-interactive"] {
+  color: var(--ink) !important;
+  font-size: var(--ky-type-nav);
+}
+
+#bit-side-nav [data-testid="nav-item-interactive"]:hover,
+#bit-side-nav
+  [data-testid="nav-item-container"]:has([aria-current="page"])
+  [data-testid="nav-item-interactive"] {
+  color: var(--ink-strong) !important;
+}
+
+/* Keep main application canvas on Busnes --bg, cards/tables on --panel */
+bit-layout > main {
+  background-color: var(--bg);
+}
+
+/* ---------- Mobile Header & Responsive Hardening (<= 720px / 390px) ---------- */
+.ky-mobile-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ky-space-2);
+  position: sticky;
+  top: 0;
+  z-index: 25;
+  padding: var(--ky-space-2) var(--ky-space-3);
+  border-bottom: 1px solid var(--line);
+  background: var(--sidebar-start);
+  color: var(--ink-strong);
+}
+
+.ky-mobile-topbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ky-space-2);
+  color: var(--ink-strong);
+  font-size: var(--ky-type-section);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  text-decoration: none;
+}
+
+.ky-mobile-topbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--ky-control-radius);
+  background: var(--panel);
+  color: var(--ink-strong);
+  cursor: pointer;
+}
+
+.ky-mobile-topbar-btn:hover {
+  background: var(--panel-hover);
+}
+
+.ky-mobile-topbar-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 720px) {
+  bit-layout > main {
+    min-width: 0 !important;
+  }
+
+  bit-container > div {
+    padding-inline: var(--ky-space-3);
+  }
+}
+
+/* Reveal hover-only action buttons on touch devices */
+@media (hover: none) {
+  .filter-option .edit-button {
+    visibility: visible !important;
+  }
+}
+
+/* ---------- Busnes Sign-in / Auth Layout ---------- */
+.ky-auth-theme {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ky-space-2);
+}
+
+.ky-auth-theme select {
+  box-sizing: border-box;
+  width: auto;
+  max-width: 100%;
+  min-height: var(--ky-control-size);
+  margin: 0;
+  padding: var(--ky-space-2) 2.25rem var(--ky-space-2) 0.75rem;
+  border: 1px solid var(--ky-field-border);
+  border-radius: var(--ky-control-radius);
+  background-color: var(--panel);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ink) 50%),
+    linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.1rem) 52%,
+    calc(100% - 0.75rem) 52%;
+  background-size: 0.35rem 0.35rem;
+  background-repeat: no-repeat;
+  color: var(--ink-strong);
+  font: inherit;
+  font-size: var(--ky-type-nav);
+  appearance: none;
+  cursor: pointer;
+}
+
+.ky-auth-theme select:hover {
+  border-color: var(--ink-strong);
+}
+
+.ky-auth-theme select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 520px) {
+  .ky-auth-theme select {
+    max-width: 11.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (pointer: coarse) {
+  .ky-auth-theme select {
+    font-size: 1rem;
+  }
+}
+
+.ky-auth-tagline {
+  margin: 0.375rem 0 0;
+  color: var(--ink);
+  font-size: var(--ky-type-body);
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: center;
+}
+
+/* ---------- Busnes Appearance 6-Pair Radio Cards (@busnes/ky-ui + KyCalendar) ---------- */
+.ky-appearance {
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--ink-strong);
+  font: inherit;
+}
+
+.ky-appearance-legend {
+  margin-block-end: 0.375rem;
+  padding: 0;
+  color: var(--ink-strong);
+  font-size: var(--ky-type-section);
+  font-weight: 600;
+}
+
+.ky-appearance-description {
+  max-inline-size: 72ch;
+  margin: 0 0 1.25rem;
+  color: var(--ink);
+  font-size: var(--ky-type-body);
+  line-height: 1.5;
+}
+
+.ky-appearance-grid.appearance-pairs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17.5rem), 1fr));
+  gap: var(--ky-space-3);
+  max-inline-size: 62rem;
+}
+
+.appearance-pair {
+  display: grid;
+  gap: var(--ky-space-3);
+  min-width: 0;
+  padding: var(--ky-space-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--ky-radius);
+  background: var(--panel);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.appearance-pair:hover {
+  border-color: var(--ink-strong);
+}
+
+.appearance-pair:has(:checked) {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.appearance-pair-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem var(--ky-space-2);
+}
+
+.appearance-pair-name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink-strong);
+}
+
+.appearance-pair-halves {
+  color: var(--ink);
+  font-size: var(--ky-type-meta);
+}
+
+.ky-appearance-preview {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  block-size: 56px;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--ky-preview-sidebar) 30%, var(--ky-preview-bg) 30%);
+}
+
+.ky-appearance-preview::before,
+.ky-appearance-preview::after {
+  position: absolute;
+  display: block;
+  block-size: 5px;
+  border-radius: 1px;
+  content: "";
+}
+
+.ky-appearance-preview[data-ky-preview$="-pair"] {
+  background: linear-gradient(
+    90deg,
+    var(--ky-preview-sidebar) 15%,
+    var(--ky-preview-bg) 15% 50%,
+    var(--ky-preview-dark-sidebar) 50% 65%,
+    var(--ky-preview-dark-bg) 65%
+  );
+}
+
+.ky-appearance-preview[data-ky-preview$="-pair"]::before {
+  inset-block-start: 12px;
+  inset-inline-start: 20%;
+  inline-size: 25%;
+  background: var(--ky-preview-accent);
+  box-shadow: 0 12px 0 color-mix(in srgb, var(--ky-preview-ink) 65%, transparent);
+}
+
+.ky-appearance-preview[data-ky-preview$="-pair"]::after {
+  inset-block-start: 12px;
+  inset-inline-start: 70%;
+  inline-size: 25%;
+  background: var(--ky-preview-dark-accent);
+  box-shadow: 0 12px 0 color-mix(in srgb, var(--ky-preview-dark-ink) 65%, transparent);
+}
+
+[data-ky-preview="busnes-pair"] {
+  --ky-preview-bg: #f8f6f0;
+  --ky-preview-sidebar: #f2efe7;
+  --ky-preview-ink: #182326;
+  --ky-preview-accent: #bf3f18;
+  --ky-preview-dark-bg: #182326;
+  --ky-preview-dark-sidebar: #1f2b2e;
+  --ky-preview-dark-ink: #f2efe8;
+  --ky-preview-dark-accent: #f5865f;
+}
+
+[data-ky-preview="matter-pair"] {
+  --ky-preview-bg: #f5efe5;
+  --ky-preview-sidebar: #ede2d2;
+  --ky-preview-ink: #2d1f15;
+  --ky-preview-accent: #805a39;
+  --ky-preview-dark-bg: #1d1b19;
+  --ky-preview-dark-sidebar: #25221f;
+  --ky-preview-dark-ink: #f0e9df;
+  --ky-preview-dark-accent: #c29a72;
+}
+
+[data-ky-preview="ocean-pair"] {
+  --ky-preview-bg: #f7f9fb;
+  --ky-preview-sidebar: #eaf1f8;
+  --ky-preview-ink: #163246;
+  --ky-preview-accent: #1d5fa6;
+  --ky-preview-dark-bg: #0f1b24;
+  --ky-preview-dark-sidebar: #112430;
+  --ky-preview-dark-ink: #e0f2fb;
+  --ky-preview-dark-accent: #6aa8e8;
+}
+
+[data-ky-preview="forest-pair"] {
+  --ky-preview-bg: #f3f6ef;
+  --ky-preview-sidebar: #e8eee1;
+  --ky-preview-ink: #203322;
+  --ky-preview-accent: #4b6b37;
+  --ky-preview-dark-bg: #142018;
+  --ky-preview-dark-sidebar: #18261c;
+  --ky-preview-dark-ink: #e3f0df;
+  --ky-preview-dark-accent: #8faa74;
+}
+
+[data-ky-preview="ky-pair"] {
+  --ky-preview-bg: #eef2f6;
+  --ky-preview-sidebar: #e7edf3;
+  --ky-preview-ink: #0f172a;
+  --ky-preview-accent: #08758b;
+  --ky-preview-dark-bg: #10161e;
+  --ky-preview-dark-sidebar: #161e27;
+  --ky-preview-dark-ink: #e2e8f0;
+  --ky-preview-dark-accent: #6fc9cc;
+}
+
+[data-ky-preview="nord-pair"] {
+  --ky-preview-bg: #eceff4;
+  --ky-preview-sidebar: #e5e9f0;
+  --ky-preview-ink: #2e3440;
+  --ky-preview-accent: #4a6a94;
+  --ky-preview-dark-bg: #2e3440;
+  --ky-preview-dark-sidebar: #3b4252;
+  --ky-preview-dark-ink: #eceff4;
+  --ky-preview-dark-accent: #88c0d0;
+}
+
+.appearance-modes {
+  display: flex;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--ky-control-radius);
+  overflow: hidden;
+}
+
+.appearance-mode {
+  position: relative;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  min-height: 40px;
+  margin: 0;
+  padding: 0 var(--ky-space-2);
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.appearance-mode + .appearance-mode {
+  border-left: 1px solid var(--line-strong);
+}
+
+.appearance-mode > input[type="radio"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.appearance-mode:hover {
+  background: var(--panel-hover);
+  color: var(--ink-strong);
+}
+
+.appearance-mode:has(:checked) {
+  background: var(--accent);
+  color: var(--button-text);
+  font-weight: 600;
+}
+
+.appearance-mode:has(:focus-visible) {
+  outline: 2px solid var(--ink-strong);
+  outline-offset: -4px;
+}
+
+@media (forced-colors: active) {
+  .appearance-pair:has(:checked) {
+    border-color: Highlight;
+  }
+  .appearance-mode:has(:checked) {
+    outline: 2px solid Highlight;
+    outline-offset: -3px;
+  }
+}
+
+/* ---------- Busnes License Link & About Dialog ---------- */
+.ky-license-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.75rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ky-license-link:hover {
+  color: var(--ink-strong);
+}
+
+.ky-license-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.ky-about {
+  box-sizing: border-box;
+  width: min(44rem, calc(100vw - 2rem));
+  max-width: none;
+  max-height: 90vh;
+  margin: auto;
+  padding: var(--ky-space-4);
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  background: var(--panel);
+  color: var(--ink-strong);
+  box-shadow: var(--ky-shadow-overlay);
+}
+
+.ky-about[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.ky-about::backdrop {
+  background: rgb(12 12 18 / 0.68);
+}
+
+.ky-about-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.ky-about-head > div {
+  display: grid;
+  gap: var(--ky-space-1);
+  min-width: 0;
+}
+
+.ky-about-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.625rem;
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+
+.ky-about-version {
+  padding: 2px var(--ky-space-2);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--ink-strong);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.ky-about-meta {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.85rem;
+}
+
+.ky-about-close {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--ky-control-size);
+  padding: var(--ky-space-2) 1rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--ky-control-radius);
+  background: var(--panel);
+  color: var(--ink-strong);
+  font: inherit;
+  font-size: var(--ky-type-nav);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ky-about-close:hover {
+  border-color: var(--ink-strong);
+  background: var(--panel-hover);
+}
+
+.ky-about-close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.ky-about-license {
+  box-sizing: border-box;
+  flex: 1;
+  width: 100%;
+  min-height: min(18rem, 48vh);
+  margin: 0;
+  padding: 0.875rem;
+  border: 1px solid var(--line);
+  border-radius: var(--ky-radius);
+  background: var(--bg);
+  color: var(--ink-strong);
+  font-family: var(--ky-font-mono);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow: auto;
+}
+
+/* ---------- Ky Suite Sidebar Brand, Lower-Left Account Footer & Actions ---------- */
+#bit-side-nav bit-nav-logo > div {
+  background: transparent !important;
+  padding: var(--ky-space-4) var(--ky-space-3) var(--ky-space-3) !important;
+}
+
+#bit-side-nav bit-nav-logo a {
+  height: 2.5rem !important;
+  padding: 0 var(--ky-space-2) !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+#bit-side-nav bit-nav-logo svg {
+  position: static !important;
+  inset: auto !important;
+  width: auto !important;
+  height: 2rem !important;
+  display: block;
+}
+
+#bit-side-nav .ky-sidenav-bottom {
+  background: transparent !important;
+  flex-shrink: 0;
+}
+
+.ky-sidebar-foot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ky-space-3);
+  padding: 0 var(--ky-space-3) var(--ky-space-4);
+}
+
+.ky-sidebar-foot > footer {
+  padding-inline: var(--ky-space-1);
+}
+
+.ky-user {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ky-space-2);
+  padding-top: var(--ky-space-3);
+  border-top: 1px solid var(--line);
+}
+
+.ky-user-copy {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.ky-user-name,
+.ky-user-role {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ky-user-name {
+  color: var(--ink-strong);
+  font-size: var(--ky-type-nav);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.ky-user-role {
+  color: var(--ink);
+  font-size: var(--ky-type-meta);
+  line-height: 1.35;
+}
+
+.ky-user-actions,
+.ky-mobile-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ky-space-1);
+  flex: none;
+}
+
+.ky-icon-button {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ky-control-size);
+  height: var(--ky-control-size);
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--ky-control-radius);
+  background: transparent;
+  color: var(--ink-strong);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.ky-icon-button:hover {
+  border-color: var(--ink-strong);
+  background: var(--panel-hover);
+  color: var(--ink-strong);
+}
+
+.ky-icon-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.ky-icon-button[aria-current="page"] {
+  background: var(--accent-soft);
+  box-shadow: inset 3px 0 var(--accent);
+}
+
+.ky-mobile-topbar-left {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ky-space-2);
+  min-width: 0;
+}
+
+.ky-content-foot {
+  margin-top: var(--ky-space-6);
+  padding: var(--ky-space-3) 0 var(--ky-space-2);
+  border-top: 1px solid var(--line);
+}
+
+/* ---------- Ky Suite Settings Page Shell & Horizontal Tabs (.ky-settings-tabs) ---------- */
+.ky-settings-shell .ky-page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ky-space-3);
+  margin-bottom: var(--ky-space-4);
+}
+
+.ky-settings-shell .ky-page-title {
+  margin: 0;
+  color: var(--ink-strong);
+  font-size: var(--ky-type-page);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.ky-settings-shell .ky-btn-secondary {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--ky-control-size);
+  padding: 0 var(--ky-space-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--ky-control-radius);
+  background: var(--panel);
+  color: var(--ink-strong);
+  font: inherit;
+  font-size: var(--ky-type-nav);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ky-settings-shell .ky-btn-secondary:hover {
+  border-color: var(--ink-strong);
+  background: var(--panel-hover);
+}
+
+.ky-settings-shell .ky-btn-secondary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.ky-settings-tabs {
+  display: flex;
+  gap: var(--ky-space-1);
+  margin: 0 0 var(--ky-space-5);
+  overflow-x: auto;
+  box-shadow: inset 0 -1px var(--line);
+}
+
+.ky-settings-tabs > .ky-nav-item {
+  box-sizing: border-box;
+  display: flex;
+  flex: none;
+  align-items: center;
+  min-height: var(--ky-control-size);
+  margin: 0;
+  padding: 0 var(--ky-space-3);
+  border: 0;
+  border-radius: var(--ky-control-radius) var(--ky-control-radius) 0 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--ky-type-nav);
+  font-weight: 500;
+  line-height: 1.25;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ky-settings-tabs > .ky-nav-item:hover {
+  background: var(--panel-hover);
+  color: var(--ink-strong);
+}
+
+.ky-settings-tabs > .ky-nav-item[aria-current="page"] {
+  background: var(--accent-soft);
+  color: var(--ink-strong);
+  font-weight: 600;
+  box-shadow: inset 0 -3px var(--accent);
+}
+
+.ky-settings-tabs > .ky-nav-item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* Collapse duplicate top-level h1 headers inside Settings child pages while preserving sub-tabs (e.g. Security) */
+.ky-settings-shell bit-header > header {
+  margin: 0 0 var(--ky-space-4) !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.ky-settings-shell bit-header > header > div:first-child {
+  display: none !important;
+}
+
+.ky-settings-shell bit-header > header:not(:has([data-tabs]:not(:empty))) {
+  display: none !important;
+}
+
+/* ---------- KyVault Welcome Dialog Banner (New Accounts) ---------- */
+.ky-welcome-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ky-space-6) var(--ky-space-4);
+  border-radius: var(--ky-radius);
+  background: linear-gradient(180deg, var(--sidebar-start), var(--sidebar-end));
+  border: 1px solid var(--line);
+}
