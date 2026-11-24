@@ -11,18 +11,10 @@ import { safeProvider } from "@bitwarden/ui-common";
 import { SharedModule } from "../../shared";
 import { ProductSwitcherModule } from "../product-switcher/product-switcher.module";
 
-import { AccountMenuComponent } from "./account-menu.component";
-
 @Component({
   selector: "app-header",
   templateUrl: "./web-header.component.html",
-  imports: [
-    SharedModule,
-    ProductSwitcherModule,
-    BannerModule,
-    HeaderComponent,
-    AccountMenuComponent,
-  ],
+  imports: [SharedModule, ProductSwitcherModule, BannerModule, HeaderComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   /**
    * Required to provide one HeaderContext instance to both the `bit-breadrumbs` declared in this

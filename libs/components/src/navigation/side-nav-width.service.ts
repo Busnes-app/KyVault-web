@@ -14,7 +14,7 @@ export const BIT_SIDE_NAV_WIDTH_KEY_DEF = new KeyDefinition<number>(
 export const SIDE_NAV_WIDTH_BOUNDS = Object.freeze({
   min: 15, // 240px
   max: 37.5, // 600px
-  default: 18.5, // 296px
+  default: 15, // 240px (Busnes standard)
 });
 
 /**

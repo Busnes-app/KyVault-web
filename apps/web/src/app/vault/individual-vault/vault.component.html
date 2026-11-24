@@ -17,8 +17,25 @@
 
 <app-vault-onboarding [ciphers]="ciphers"></app-vault-onboarding>
 
-<div class="tw-flex tw-flex-row -tw-mx-2.5">
-  <div class="tw-basis-1/4 tw-max-w-1/4 tw-px-2.5">
+<div class="tw-mb-3 lg:tw-hidden">
+  <button
+    type="button"
+    bitButton
+    buttonType="secondary"
+    size="small"
+    (click)="mobileFiltersOpen = !mobileFiltersOpen"
+    [attr.aria-expanded]="mobileFiltersOpen"
+  >
+    <i class="bwi bwi-filter tw-mr-1.5" aria-hidden="true"></i>
+    {{ mobileFiltersOpen ? "Hide filters" : "Filters" }}
+  </button>
+</div>
+
+<div class="tw-flex tw-flex-col lg:tw-flex-row tw-gap-5">
+  <div
+    class="tw-w-full lg:tw-block lg:tw-w-64 lg:tw-shrink-0"
+    [class.tw-hidden]="!mobileFiltersOpen"
+  >
     <app-vault-filter
       #vaultFilter
       [activeFilter]="activeFilter"
@@ -27,7 +44,7 @@
       (onEditFolder)="editFolder($event)"
     ></app-vault-filter>
   </div>
-  <div class="tw-basis-3/4 tw-max-w-3/4 tw-px-2.5">
+  <div class="tw-min-w-0 tw-flex-1">
     @if (activeFilter.isDeleted) {
       <bit-callout type="warning">
         {{ trashCleanupWarning }}

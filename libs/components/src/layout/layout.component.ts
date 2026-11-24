@@ -110,7 +110,7 @@ export class LayoutComponent {
    * full nav or the siderail fits.  When false the nav column collapses to 0px and <main>
    * sits flush against the container edge.
    */
-  private readonly navOccupiesColumn = computed(
+  protected readonly navOccupiesColumn = computed(
     () => this.hasSideNav() && (this.sideNavService.isPushMode() || this.siderailIsPushMode()),
   );
 

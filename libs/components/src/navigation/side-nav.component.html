@@ -166,25 +166,10 @@
           }
         </div>
       </div>
-      <div class="tw-w-full tw-bg-bg-nav">
-        <bit-nav-divider></bit-nav-divider>
+      <div class="tw-w-full tw-bg-bg-nav ky-sidenav-bottom">
         @if (open) {
           <ng-container *ngTemplateOutlet="footerContent"></ng-container>
         }
-        <div class="tw-m-4">
-          <button
-            #toggleButton
-            type="button"
-            class="tw-mx-auto tw-block"
-            [bitIconButton]="open ? 'bwi-angle-left' : 'bwi-angle-right'"
-            buttonType="side-nav"
-            size="small"
-            (click)="sideNavService.toggle()"
-            [label]="'toggleSideNavigation' | i18n"
-            [attr.aria-expanded]="open"
-            aria-controls="bit-side-nav"
-          ></button>
-        </div>
       </div>
     </nav>
     <div

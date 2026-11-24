@@ -57,19 +57,14 @@
         <bit-icon name="bwi-user" class="bwi-fw" aria-hidden="true"></bit-icon>
         {{ "accountSettings" | i18n }}
       </a>
-      <a
-        bitMenuItem
-        href="https://github.com/dani-garcia/vaultwarden"
-        target="_blank"
-        rel="noreferrer"
-      >
-        <bit-icon name="bwi-question-circle" class="bwi-fw" aria-hidden="true"></bit-icon>
-        {{ "getHelp" | i18n }}
+      <a bitMenuItem routerLink="/settings/appearance">
+        <bit-icon name="bwi-sliders" class="bwi-fw" aria-hidden="true"></bit-icon>
+        {{ "appearance" | i18n }}
       </a>
-      <a bitMenuItem href="https://bitwarden.com/download/" target="_blank" rel="noreferrer">
-        <bit-icon name="bwi-download" class="bwi-fw" aria-hidden="true"></bit-icon>
-        {{ "getApps" | i18n }}
-      </a>
+      <button bitMenuItem type="button" (click)="aboutDialog.open()">
+        <bit-icon name="bwi-info-circle" class="bwi-fw" aria-hidden="true"></bit-icon>
+        License &amp; Notices
+      </button>
 
       <bit-menu-divider></bit-menu-divider>
 
@@ -86,4 +81,10 @@
       </button>
     </div>
   </bit-menu>
+
+  <ky-about-trigger
+    #aboutDialog
+    [hiddenTrigger]="true"
+    [version]="(version$ | async) ?? undefined"
+  ></ky-about-trigger>
 }

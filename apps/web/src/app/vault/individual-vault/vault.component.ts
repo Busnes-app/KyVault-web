@@ -204,6 +204,7 @@ export class VaultComponent<C extends CipherViewLike> implements OnInit, OnDestr
   protected performingInitialLoad = true;
   protected refreshing = false;
   protected processingEvent = false;
+  protected mobileFiltersOpen = false;
   protected filter: RoutedVaultFilterModel = {};
   protected canAccessPremium: boolean = false;
   protected allCollections: CollectionView[] = [];

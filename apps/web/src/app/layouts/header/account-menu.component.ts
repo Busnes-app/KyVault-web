@@ -9,6 +9,7 @@ import {
   VaultTimeoutSettingsService,
 } from "@bitwarden/common/key-management/vault-timeout";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
+import { KyAboutTriggerComponent } from "@bitwarden/components";
 import { LockService, LockSource } from "@bitwarden/unlock";
 
 import { DynamicAvatarComponent } from "../../components/dynamic-avatar.component";
@@ -17,7 +18,7 @@ import { SharedModule } from "../../shared";
 @Component({
   selector: "app-account-menu",
   templateUrl: "./account-menu.component.html",
-  imports: [SharedModule, DynamicAvatarComponent],
+  imports: [SharedModule, DynamicAvatarComponent, KyAboutTriggerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountMenuComponent {
@@ -40,6 +41,7 @@ export class AccountMenuComponent {
     .pipe(map((actions) => actions.includes(VaultTimeoutAction.Lock)));
   protected readonly selfHosted = this.platformUtilsService.isSelfHost();
   protected readonly hostname = globalThis.location.hostname;
+  protected readonly version$ = this.platformUtilsService.getApplicationVersion();
 
   protected async lock() {
     const userId = this.account()?.id;

@@ -20,7 +20,6 @@ import { I18nPipe } from "@bitwarden/ui-common";
 import { BitIconButtonComponent } from "../icon-button/icon-button.component";
 import { SIDERAIL_WIDTH_REM } from "../shared";
 
-import { NavDividerComponent } from "./nav-divider.component";
 import { resizeHandlePercent } from "./side-nav-resize";
 import { media, SideNavService } from "./side-nav.service";
 
@@ -32,14 +31,7 @@ export type SideNavVariant = "primary" | "secondary";
 @Component({
   selector: "bit-side-nav",
   templateUrl: "side-nav.component.html",
-  imports: [
-    CdkTrapFocus,
-    NavDividerComponent,
-    BitIconButtonComponent,
-    I18nPipe,
-    DragDropModule,
-    NgTemplateOutlet,
-  ],
+  imports: [CdkTrapFocus, BitIconButtonComponent, I18nPipe, DragDropModule, NgTemplateOutlet],
   host: {
     // Grid placement: always col 1.  In overlay mode the element is also
     // switched to position:fixed so it escapes the grid's stacking context

@@ -96,6 +96,7 @@ import { RequestSMAccessComponent } from "./secrets-manager/secrets-manager-land
 import { SMLandingComponent } from "./secrets-manager/secrets-manager-landing/sm-landing.component";
 import { AppearanceComponent } from "./settings/appearance.component";
 import { DomainRulesComponent } from "./settings/domain-rules.component";
+import { KySettingsLayoutComponent } from "./settings/ky-settings-layout.component";
 import { CredentialGeneratorComponent } from "./tools/credential-generator/credential-generator.component";
 import { unsavedSendEditsGuard } from "./tools/guards/unsaved-send-edits.guard";
 import { ImportShellWebComponent } from "./tools/import/import-shell-web.component";
@@ -735,6 +736,7 @@ const routes: Routes = [
       },
       {
         path: "settings",
+        component: KySettingsLayoutComponent,
         children: [
           { path: "", pathMatch: "full", redirectTo: AuthWebRouteSegment.Account },
           {

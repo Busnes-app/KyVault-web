@@ -56,12 +56,34 @@
     tabindex="-1"
     bitScrollLayoutHost
     class="tw-col-start-2 tw-row-start-1 tw-overflow-auto tw-max-h-full tw-bg-background tw-pt-6 tw-@container has-[bit-page]:tw-p-0"
-    [style.min-width.rem]="mainContentMinWidthRem"
+    [style.min-width.rem]="navOccupiesColumn() ? mainContentMinWidthRem : 0"
     [class.tw-rounded-tl-2xl]="showRoundedCorner()"
     [class]="vfo1Enabled() ? ['tw-p-10', 'has-[bit-header]:tw-pt-0'] : ['tw-p-8']"
   >
+    @if (hasSideNav() && !navOccupiesColumn()) {
+      <header class="ky-mobile-topbar">
+        <div class="ky-mobile-topbar-left">
+          <button
+            type="button"
+            class="ky-mobile-topbar-btn"
+            (click)="sideNavService.toggle()"
+            aria-label="Toggle navigation"
+          >
+            <i class="bwi bwi-bars" aria-hidden="true"></i>
+          </button>
+          <a [routerLink]="['/']" class="ky-mobile-topbar-brand">
+            <img src="images/kyvault-mark.svg" alt="" width="24" height="24" />
+            <span>KyVault</span>
+          </a>
+        </div>
+        <ng-content select="[slot=mobile-actions]"></ng-content>
+      </header>
+    }
     <!-- ^ If updating this padding, also update the padding correction in bit-banner! ^ -->
     <ng-content></ng-content>
+    @if (hasSideNav() && !navOccupiesColumn()) {
+      <ng-content select="[slot=content-foot]"></ng-content>
+    }
   </main>
 
   <!-- Footer region (always col 2): overlaps <main> but is a sibling of it — outside the

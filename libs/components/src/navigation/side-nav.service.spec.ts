@@ -469,6 +469,7 @@ describe("SideNavService", () => {
       });
 
       it("narrows by one rem on ArrowLeft", () => {
+        service.setWidthFromKeys("ArrowRight");
         const widthBefore = currentWidth();
 
         service.setWidthFromKeys("ArrowLeft");
