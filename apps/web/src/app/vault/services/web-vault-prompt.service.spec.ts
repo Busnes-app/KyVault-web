@@ -12,7 +12,7 @@ import { Account, AccountService } from "@bitwarden/common/auth/abstractions/acc
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { ServerSettings } from "@bitwarden/common/platform/models/domain/server-settings";
 import { UserId } from "@bitwarden/common/types/guid";
-import { DialogRef, DialogService, SideNavService } from "@bitwarden/components";
+import { DialogRef, DialogService } from "@bitwarden/components";
 import { LogService } from "@bitwarden/logging";
 import {
   CoachmarkService,
@@ -52,7 +52,6 @@ describe("WebVaultPromptService", () => {
   const logError = jest.fn();
   const conditionallyPromptUserForExtension = jest.fn().mockResolvedValue(false);
   const conditionallyOpenNewExperience = jest.fn().mockResolvedValue(false);
-  const sideNavOpen = signal(false);
   const tourRunning = signal(false);
 
   let serverSettings$: BehaviorSubject<ServerSettings | null>;
@@ -100,7 +99,6 @@ describe("WebVaultPromptService", () => {
           provide: NewExperienceDialogService,
           useValue: { conditionallyOpen: conditionallyOpenNewExperience },
         },
-        { provide: SideNavService, useValue: { open: sideNavOpen } },
         { provide: CoachmarkService, useValue: { isRunning: tourRunning.asReadonly() } },
       ],
     });
@@ -122,14 +120,6 @@ describe("WebVaultPromptService", () => {
 
       expect(
         service["vaultItemTransferService"].enforceOrganizationDataOwnership,
-      ).toHaveBeenCalledWith(mockUserId);
-    });
-
-    it("calls conditionallyPromptUserForExtension with the userId", async () => {
-      await service.conditionallyPromptUser();
-
-      expect(
-        service["webVaultExtensionPromptService"].conditionallyPromptUserForExtension,
       ).toHaveBeenCalledWith(mockUserId);
     });
 
@@ -158,53 +148,26 @@ describe("WebVaultPromptService", () => {
     });
   });
 
-  describe("new experience dialog", () => {
-    it("offers it the redesigned vault screenshots", async () => {
+  describe("welcome dialog", () => {
+    it("shows the KyVault welcome dialog", async () => {
       await service.conditionallyPromptUser();
 
-      expect(conditionallyOpenNewExperience).toHaveBeenCalledWith(mockUserId, {
-        lightImgSrc: "images/new-experience/new-experience.light.png",
-        darkImgSrc: "images/new-experience/new-experience.dark.png",
-      });
+      expect(conditionallyShowWelcomeDialog).toHaveBeenCalled();
     });
 
-    it("skips it for a user who was just welcomed to Bitwarden", async () => {
-      conditionallyShowWelcomeDialog.mockResolvedValueOnce(true);
+    it("skips the welcome dialog when an upgrade prompt was shown", async () => {
+      displayUpgradePromptConditionally.mockResolvedValueOnce(true);
 
+      await service.conditionallyPromptUser();
+
+      expect(conditionallyShowWelcomeDialog).not.toHaveBeenCalled();
+    });
+
+    it("never shows the upstream new-experience or extension prompts", async () => {
       await service.conditionallyPromptUser();
 
       expect(conditionallyOpenNewExperience).not.toHaveBeenCalled();
-    });
-
-    it("opens the side nav once it has opened, so the tour callout is visible", async () => {
-      sideNavOpen.set(false);
-      conditionallyOpenNewExperience.mockResolvedValueOnce(true);
-
-      await service.conditionallyPromptUser();
-
-      expect(sideNavOpen()).toBe(true);
-    });
-
-    it("leaves the side nav alone when it did not open", async () => {
-      sideNavOpen.set(false);
-
-      await service.conditionallyPromptUser();
-
-      expect(sideNavOpen()).toBe(false);
-    });
-
-    it("holds back the extension prompt when it opened, so the two do not stack", async () => {
-      conditionallyOpenNewExperience.mockResolvedValueOnce(true);
-
-      await service.conditionallyPromptUser();
-
       expect(conditionallyPromptUserForExtension).not.toHaveBeenCalled();
-    });
-
-    it("lets the extension prompt through when it did not open", async () => {
-      await service.conditionallyPromptUser();
-
-      expect(conditionallyPromptUserForExtension).toHaveBeenCalledWith(mockUserId);
     });
   });
 

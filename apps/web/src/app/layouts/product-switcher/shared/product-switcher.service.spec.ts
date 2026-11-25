@@ -135,25 +135,17 @@ describe("ProductSwitcherService", () => {
     });
 
     describe("Secret Manager", () => {
-      it("is included in other when there are no organizations with SM", async () => {
-        initiateService();
+      it.each([false, true])(
+        "is not advertised in other when no organization has SM (VFO1 %s)",
+        async (flag) => {
+          vfo1Enabled = flag;
+          initiateService();
 
-        const products = await firstValueFrom(service.products$);
+          const products = await firstValueFrom(service.products$);
 
-        expect(products.other.find((p) => p.name === "Secrets Manager")).toBeDefined();
-      });
-
-      it("overrides the other section name when the VFO1 flag is enabled", async () => {
-        vfo1Enabled = true;
-
-        initiateService();
-
-        const products = await firstValueFrom(service.products$);
-
-        expect(
-          products.other.find((p) => p.name === "Secrets Manager").otherProductOverrides.name,
-        ).toBe("getSecretsManager");
-      });
+          expect(products.other.find((p) => p.name === "Secrets Manager")).toBeUndefined();
+        },
+      );
 
       it("is included in bento when there is an organization with SM", async () => {
         organizationService.organizations$.mockReturnValue(
@@ -175,34 +167,18 @@ describe("ProductSwitcherService", () => {
     });
 
     describe("Admin/Organizations", () => {
-      it("includes Organizations with the internal route in other when there are organizations on cloud", async () => {
-        initiateService();
+      it.each([false, true])(
+        "does not advertise Organizations in other (self-host %s)",
+        async (selfHost) => {
+          platformUtilsService.isSelfHost.mockReturnValue(selfHost);
+          initiateService();
 
-        const products = await firstValueFrom(service.products$);
+          const products = await firstValueFrom(service.products$);
 
-        const organizations = products.other.find((p) => p.name === "Organizations");
-        expect(organizations).toBeDefined();
-        expect(organizations.marketingRoute.route).toBe("/create-organization");
-        expect(organizations.marketingRoute.external).toBe(false);
-
-        expect(products.other.find((p) => p.name === "Organizations")).toBeDefined();
-        expect(products.bento.find((p) => p.name === "Admin Console")).toBeUndefined();
-      });
-
-      it("includes Organizations with the external route in other when there are organizations on Self-Host", async () => {
-        platformUtilsService.isSelfHost.mockReturnValue(true);
-        initiateService();
-
-        const products = await firstValueFrom(service.products$);
-
-        const organizations = products.other.find((p) => p.name === "Organizations");
-        expect(organizations).toBeDefined();
-        expect(organizations.marketingRoute.route).toBe("https://bitwarden.com/products/business/");
-        expect(organizations.marketingRoute.external).toBe(true);
-
-        expect(products.other.find((p) => p.name === "Organizations")).toBeDefined();
-        expect(products.bento.find((p) => p.name === "Admin Console")).toBeUndefined();
-      });
+          expect(products.other.find((p) => p.name === "Organizations")).toBeUndefined();
+          expect(products.bento.find((p) => p.name === "Admin Console")).toBeUndefined();
+        },
+      );
 
       it("includes Admin Console in bento when a user has access to it", async () => {
         organizationService.organizations$.mockReturnValue(
@@ -279,12 +255,15 @@ describe("ProductSwitcherService", () => {
 
     it("marks Secret Manager as active", async () => {
       router.url = "/sm/";
+      organizationService.organizations$.mockReturnValue(
+        of([{ id: "1234", canAccessSecretsManager: true, enabled: true }] as Organization[]),
+      );
 
       initiateService();
 
       const products = await firstValueFrom(service.products$);
 
-      const { isActive } = products.other.find((p) => p.name === "Secrets Manager");
+      const { isActive } = products.bento.find((p) => p.name === "Secrets Manager");
 
       expect(isActive).toBe(true);
     });

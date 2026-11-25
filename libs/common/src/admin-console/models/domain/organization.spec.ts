@@ -297,13 +297,13 @@ describe("Organization", () => {
   });
 
   describe("canUseAccessIntelligence", () => {
-    it("should return true when the server UseRiskInsights ability is enabled, regardless of plan type", () => {
+    it("should return false even when the server UseRiskInsights ability is enabled", () => {
       data.useAccessIntelligence = true;
       data.productTierType = ProductTierType.Free;
 
       const organization = new Organization(data);
 
-      expect(organization.canUseAccessIntelligence).toBe(true);
+      expect(organization.canUseAccessIntelligence).toBe(false);
     });
 
     it("should return false when the server ability is disabled, even for Enterprise plans", () => {

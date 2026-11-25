@@ -13,7 +13,7 @@ describe("sso", () => {
     // Mock location
     Object.defineProperty(window, "location", {
       value: {
-        href: "",
+        href: "https://test.bitwarden.com/sso-connector.html?code=testcode&state=teststate",
         origin: "https://test.bitwarden.com",
       },
       writable: true,

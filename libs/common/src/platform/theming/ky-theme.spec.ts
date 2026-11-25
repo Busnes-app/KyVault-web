@@ -77,7 +77,7 @@ describe("ky-theme", () => {
         store.delete(k);
       },
       clear: () => store.clear(),
-      key: () => null,
+      key: (): null => null,
       length: 0,
     } as unknown as Storage;
 

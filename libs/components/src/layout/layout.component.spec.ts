@@ -89,9 +89,8 @@ describe("LayoutComponent push/overlay reconciliation", () => {
   const PUSH_CEILING_REM = CONTAINER_REM - MAIN_CONTENT_MIN_WIDTH_REM;
   const OVER_CEILING_REM = PUSH_CEILING_REM + ARROW_STEP_REM;
   /** Arrow presses from the default width to the first width past the ceiling. */
-  const STEPS_PAST_CEILING = Math.ceil(
-    (PUSH_CEILING_REM - SIDE_NAV_WIDTH_BOUNDS.default) / ARROW_STEP_REM,
-  );
+  const STEPS_PAST_CEILING =
+    Math.floor((PUSH_CEILING_REM - SIDE_NAV_WIDTH_BOUNDS.default) / ARROW_STEP_REM) + 1;
 
   let stubbedClientWidth = CONTAINER_WIDTH;
   let originalClientWidth: PropertyDescriptor | undefined;

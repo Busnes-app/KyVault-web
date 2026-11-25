@@ -8,9 +8,10 @@ import { DomainSettingsService } from "@bitwarden/common/autofill/services/domai
 import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
-import { Theme, ThemeTypes } from "@bitwarden/common/platform/enums";
-import { ThemeStateService } from "@bitwarden/common/platform/theming/theme-state.service";
+import { KY_THEME_CHOICE_GROUPS } from "@bitwarden/common/platform/theming/ky-theme";
 import { VaultCopyButtonsService } from "@bitwarden/vault";
+
+import { KyThemeService } from "../core/ky-theme.service";
 
 import { AppearanceComponent } from "./appearance.component";
 
@@ -18,13 +19,12 @@ describe("AppearanceComponent", () => {
   let component: AppearanceComponent;
   let fixture: ComponentFixture<AppearanceComponent>;
   let mockI18nService: MockProxy<I18nService>;
-  let mockThemeStateService: MockProxy<ThemeStateService>;
+  let mockKyThemeService: MockProxy<KyThemeService>;
   let mockDomainSettingsService: MockProxy<DomainSettingsService>;
   let mockConfigService: MockProxy<ConfigService>;
   let mockVaultCopyButtonsService: MockProxy<VaultCopyButtonsService>;
 
   const mockShowFavicons$ = new BehaviorSubject<boolean>(true);
-  const mockSelectedTheme$ = new BehaviorSubject<Theme>(ThemeTypes.Light);
   const mockUserSetLocale$ = new BehaviorSubject<string | undefined>("en");
   const mockShowQuickCopyActions$ = new BehaviorSubject<boolean>(false);
   const mockFeatureFlag$ = new BehaviorSubject<boolean>(true);
@@ -39,7 +39,7 @@ describe("AppearanceComponent", () => {
 
   beforeEach(async () => {
     mockI18nService = mock<I18nService>();
-    mockThemeStateService = mock<ThemeStateService>();
+    mockKyThemeService = mock<KyThemeService>();
     mockDomainSettingsService = mock<DomainSettingsService>();
     mockConfigService = mock<ConfigService>();
     mockVaultCopyButtonsService = mock<VaultCopyButtonsService>();
@@ -52,13 +52,12 @@ describe("AppearanceComponent", () => {
     mockI18nService.t.mockImplementation((key: string) => `${key}-used-i18n`);
     mockI18nService.userSetLocale$ = mockUserSetLocale$;
 
-    mockThemeStateService.selectedTheme$ = mockSelectedTheme$;
     mockDomainSettingsService.showFavicons$ = mockShowFavicons$;
     mockVaultCopyButtonsService.showQuickCopyActions$ = mockShowQuickCopyActions$;
     mockConfigService.getFeatureFlag$.mockReturnValue(mockFeatureFlag$);
 
     mockDomainSettingsService.setShowFavicons.mockResolvedValue(undefined);
-    mockThemeStateService.setSelectedTheme.mockResolvedValue(undefined);
+    mockKyThemeService.setChoice.mockResolvedValue(undefined);
     mockI18nService.setLocale.mockResolvedValue(undefined);
     mockVaultCopyButtonsService.setShowQuickCopyActions.mockResolvedValue(undefined);
 
@@ -66,7 +65,7 @@ describe("AppearanceComponent", () => {
       imports: [AppearanceComponent, ReactiveFormsModule, NoopAnimationsModule],
       providers: [
         { provide: I18nService, useValue: mockI18nService },
-        { provide: ThemeStateService, useValue: mockThemeStateService },
+        { provide: KyThemeService, useValue: mockKyThemeService },
         { provide: DomainSettingsService, useValue: mockDomainSettingsService },
         { provide: ConfigService, useValue: mockConfigService },
         { provide: VaultCopyButtonsService, useValue: mockVaultCopyButtonsService },
@@ -104,21 +103,14 @@ describe("AppearanceComponent", () => {
       });
     });
 
-    describe("theme options setup", () => {
-      it("should create theme options with Light, Dark, and System", () => {
-        expect(component.themeOptions).toEqual([
-          { name: "themeLight-used-i18n", value: ThemeTypes.Light },
-          { name: "themeDark-used-i18n", value: ThemeTypes.Dark },
-          { name: "themeSystem-used-i18n", value: ThemeTypes.System },
-        ]);
-      });
+    it("offers the Ky theme choice groups", () => {
+      expect((component as any).themeChoiceGroups).toBe(KY_THEME_CHOICE_GROUPS);
     });
   });
 
   describe("ngOnInit", () => {
     it("should initialize form with values", fakeAsync(() => {
       mockShowFavicons$.next(false);
-      mockSelectedTheme$.next(ThemeTypes.Dark);
       mockUserSetLocale$.next("es");
       mockShowQuickCopyActions$.next(true);
 
@@ -127,7 +119,6 @@ describe("AppearanceComponent", () => {
 
       expect(component.form.value).toEqual({
         enableFavicons: false,
-        theme: ThemeTypes.Dark,
         locale: "es",
         showQuickCopyActions: true,
       });
@@ -172,29 +163,15 @@ describe("AppearanceComponent", () => {
     }));
   });
 
-  describe("theme value changes", () => {
-    beforeEach(fakeAsync(() => {
-      fixture.detectChanges();
-      flush();
-      jest.clearAllMocks();
-    }));
+  describe("selectTheme", () => {
+    it.each(["system", "nord", "busnes-dark"] as const)(
+      "stores %s through the Ky theme service",
+      async (choice) => {
+        await (component as any).selectTheme(choice);
 
-    it.each([ThemeTypes.Light, ThemeTypes.Dark, ThemeTypes.System])(
-      "should call setSelectedTheme when theme changes to %s",
-      fakeAsync((themeType: Theme) => {
-        component.form.controls.theme.setValue(themeType);
-        flush();
-
-        expect(mockThemeStateService.setSelectedTheme).toHaveBeenCalledWith(themeType);
-      }),
+        expect(mockKyThemeService.setChoice).toHaveBeenCalledWith(choice);
+      },
     );
-
-    it("should not call setSelectedTheme when value is null", fakeAsync(() => {
-      component.form.controls.theme.setValue(null);
-      flush();
-
-      expect(mockThemeStateService.setSelectedTheme).not.toHaveBeenCalled();
-    }));
   });
 
   describe("locale value changes", () => {

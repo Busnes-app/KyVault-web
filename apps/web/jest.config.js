@@ -8,6 +8,11 @@ const sharedConfig = require("../../libs/shared/jest.config.angular");
 module.exports = {
   ...sharedConfig,
   setupFilesAfterEnv: ["<rootDir>/test.setup.ts"],
+  // Vaultwarden patches the plan picker down to the free plan; this spec covers the paid flows it removed.
+  testPathIgnorePatterns: [
+    ...sharedConfig.testPathIgnorePatterns,
+    "organization-plans\\.component\\.spec\\.ts$",
+  ],
   moduleNameMapper: {
     // Replace ESM SDK with Node compatible SDK
     "@bitwarden/common/platform/services/sdk/default-sdk-client-factory":

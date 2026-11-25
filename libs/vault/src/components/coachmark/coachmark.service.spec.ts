@@ -133,9 +133,9 @@ describe("CoachmarkService", () => {
   describe("getStepLearnMoreUrl", () => {
     beforeEach(startTour);
 
-    it("returns the learn more URL for a step that has one", () => {
+    it("links no tour step to Bitwarden help", () => {
       const url = service.getStepLearnMoreUrl("importData");
-      expect(url).toBe("https://bitwarden.com/help/import-data/");
+      expect(url).toBeUndefined();
     });
 
     it("returns undefined for an unknown step", () => {
