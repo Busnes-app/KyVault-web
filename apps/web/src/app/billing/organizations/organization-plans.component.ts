@@ -1326,36 +1326,7 @@ export class OrganizationPlansComponent implements OnInit, OnDestroy {
   }
 
   private upgradeFlowPrefillForm() {
-    return; // Vaultwarden only supports free plan
-    if (this.acceptingSponsorship()) {
-      this.formGroup.controls.productTier.setValue(ProductTierType.Families);
-      this.changedProduct();
-      return;
-    }
-
-    const currentPlan = this.currentPlan();
-    if (currentPlan && currentPlan.productTier !== ProductTierType.Enterprise) {
-      const upgradedPlan = this.passwordManagerPlans.find((plan) => {
-        if (currentPlan.productTier === ProductTierType.Free) {
-          return plan.type === this._familyPlan;
-        }
-
-        if (
-          currentPlan.productTier === ProductTierType.Families &&
-          !this.teamsStarterPlanIsAvailable()
-        ) {
-          return plan.type === PlanType.TeamsAnnually;
-        }
-
-        return plan.upgradeSortOrder === currentPlan.upgradeSortOrder + 1;
-      });
-
-      if (upgradedPlan) {
-        this.formGroup.controls.plan.setValue(upgradedPlan.type);
-        this.formGroup.controls.productTier.setValue(upgradedPlan.productTier);
-        this.changedProduct();
-      }
-    }
+    // Vaultwarden only supports the free plan, so there is no upgrade to prefill.
   }
 
   private planIsEnabled(plan: PlanResponse) {

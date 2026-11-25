@@ -37,7 +37,7 @@ export class WebCryptoFunctionService implements CryptoFunctionService {
           "tw-p-2 tw-ps-4 tw-text-main tw-bg-warning-100 " +
           "tw-border-solid tw-border-2 tw-border-warning-700 tw-rounded-2xl",
       );
-      spinnerDiv.replaceChild(warningDiv, spinnerDiv.firstChild);
+      spinnerDiv.replaceChildren(warningDiv);
 
       throw new Error(
         "Could not instantiate WebCryptoFunctionService. Could not locate Subtle crypto.",

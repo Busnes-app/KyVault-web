@@ -575,7 +575,7 @@ export class SsoComponent implements OnInit {
     } else {
       this.toastService.showToast({
         variant: "error",
-        title: null,
+        title: "",
         message: e.message,
       });
     }

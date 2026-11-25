@@ -197,15 +197,13 @@ describe("BillingConstraintService", () => {
       });
     });
 
-    it("shoud throw if missing billingMetadata", () => {
+    it("counts missing occupied seats as zero", () => {
       const organization = createMockOrganization({ seats: 10 });
       const billingMetadata = createMockBillingMetadata({
         organizationOccupiedSeats: undefined as any,
       });
 
-      const err = () => service.checkSeatLimit(organization, billingMetadata);
-
-      expect(err).toThrow("Cannot check seat limit: billingMetadata is null or undefined.");
+      expect(service.checkSeatLimit(organization, billingMetadata)).toEqual({ canAddUsers: true });
     });
   });
 

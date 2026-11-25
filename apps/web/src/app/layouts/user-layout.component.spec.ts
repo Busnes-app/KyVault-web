@@ -26,7 +26,6 @@ import {
 } from "@bitwarden/vault";
 
 import { PremiumSubscriptionRoutingService } from "../billing/individual/services/premium-subscription-routing.service";
-import { BillingFreeFamiliesNavItemComponent } from "../billing/shared/billing-free-families-nav-item.component";
 import { PamUserNavSlotComponent } from "../pam/user-nav-slot/pam-user-nav-slot.component";
 
 import { UserLayoutComponent } from "./user-layout.component";
@@ -45,13 +44,6 @@ class MockWebLayoutComponent {}
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class MockWebSideNavComponent {}
-
-@Component({
-  selector: "billing-free-families-nav-item",
-  template: "",
-  changeDetection: ChangeDetectionStrategy.OnPush,
-})
-class MockBillingFreeFamiliesNavItemComponent {}
 
 @Component({
   selector: "app-pam-user-nav-slot",
@@ -202,19 +194,13 @@ describe("UserLayoutComponent", () => {
     })
       .overrideComponent(UserLayoutComponent, {
         remove: {
-          imports: [
-            WebLayoutModule,
-            BillingFreeFamiliesNavItemComponent,
-            CoachmarkComponent,
-            PamUserNavSlotComponent,
-          ],
+          imports: [WebLayoutModule, CoachmarkComponent, PamUserNavSlotComponent],
         },
         add: {
           imports: [
             NavigationModule,
             MockWebLayoutComponent,
             MockWebSideNavComponent,
-            MockBillingFreeFamiliesNavItemComponent,
             MockCoachmarkComponent,
             MockPamUserNavSlotComponent,
           ],
@@ -255,18 +241,14 @@ describe("UserLayoutComponent", () => {
       expect(text).not.toContain("importNoun");
     });
 
-    it("renders Manage with My folders, Archive, Trash and Settings", () => {
+    it("renders Manage with My folders, Archive and Trash", () => {
       const text = navText();
 
-      expect(text).toEqual(
-        expect.arrayContaining(["manage", "myFolders", "archiveNoun", "trash", "settings"]),
-      );
+      expect(text).toEqual(expect.arrayContaining(["manage", "myFolders", "archiveNoun", "trash"]));
     });
 
-    it("renders Export as the last Settings child", () => {
-      const children = childText(expandGroup("settings"));
-
-      expect(children[children.length - 1]).toBe("exportNoun");
+    it("leaves Settings to the sidebar footer", () => {
+      expect(navText()).not.toContain("settings");
     });
 
     it("anchors the security step on Reports", () => {
@@ -287,14 +269,6 @@ describe("UserLayoutComponent", () => {
         reports: "position-for-monitorSecurity",
         sharedFolders: "position-for-shareWithCollections",
       });
-    });
-
-    it("renders Add plan after Appearance and before Domain rules", () => {
-      const children = childText(expandGroup("settings"));
-
-      expect(children).toContain("addPlan");
-      expect(children.indexOf("appearance")).toBeLessThan(children.indexOf("addPlan"));
-      expect(children.indexOf("addPlan")).toBeLessThan(children.indexOf("domainRules"));
     });
   });
 });

@@ -269,8 +269,8 @@ describe("OrganizationLayoutComponent", () => {
     });
 
     describe("canShowBillingTab", () => {
-      it("returns true when isOwner", () => {
-        expect(component.canShowBillingTab(makeOrg({ isOwner: true }))).toBe(true);
+      it("returns false even for an owner, since billing is not offered", () => {
+        expect(component.canShowBillingTab(makeOrg({ isOwner: true }))).toBe(false);
       });
 
       it("returns false when not owner", () => {
