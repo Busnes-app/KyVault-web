@@ -1,34 +1,50 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/bitwarden/brand/main/screenshots/apps-combo-logo.png" alt="Bitwarden" />
-</p>
-<p align="center">
-  <a href="https://github.com/bitwarden/clients/actions/workflows/build-browser.yml?query=branch:main" target="_blank"><img src="https://github.com/bitwarden/clients/actions/workflows/build-browser.yml/badge.svg?branch=main" alt="GitHub Workflow browser build on main" /></a>
-  <a href="https://github.com/bitwarden/clients/actions/workflows/build-cli.yml?query=branch:main" target="_blank"><img src="https://github.com/bitwarden/clients/actions/workflows/build-cli.yml/badge.svg?branch=main" alt="GitHub Workflow CLI build on main" /></a>
-  <a href="https://github.com/bitwarden/clients/actions/workflows/build-desktop.yml?query=branch:main" target="_blank"><img src="https://github.com/bitwarden/clients/actions/workflows/build-desktop.yml/badge.svg?branch=main" alt="GitHub Workflow desktop build on main" /></a>
-  <a href="https://github.com/bitwarden/clients/actions/workflows/build-web.yml?query=branch:main" target="_blank"><img src="https://github.com/bitwarden/clients/actions/workflows/build-web.yml/badge.svg?branch=main" alt="GitHub Workflow web build on main" /></a>
-</p>
+# KyVault-web
 
----
+**Busnes-app's GPL-3.0 fork of the [Bitwarden web vault](https://github.com/bitwarden/clients)** (`apps/web` and shared `libs/`) — the self-hosted web client paired with [KyVault-backend](https://github.com/Busnes-app/KyVault-backend) in the [Busnes.app](https://busnes.app) Ky suite.
 
-# Bitwarden Client Applications
+> [!IMPORTANT]
+> **Report bugs and issues for this fork in [Busnes-app/KyVault-web](https://github.com/Busnes-app/KyVault-web/issues).** Do not report KyVault-web issues to official Bitwarden support channels. For private vulnerability reporting, see the repository's GitHub **Security** tab (and upstream policy context in [SECURITY.md](SECURITY.md)).
 
-This repository houses all Bitwarden client applications except the mobile applications ([iOS](https://github.com/bitwarden/ios) | [android](https://github.com/bitwarden/android)).
+## Development and build
 
-Please refer to the [Clients section](https://contributing.bitwarden.com/getting-started/clients/) of the [Contributing Documentation](https://contributing.bitwarden.com/) for build instructions, recommended tooling, code style tips, and lots of other great information to get you started.
+Requires the Node.js major version specified in [`.nvmrc`](.nvmrc) (`v24`).
 
-## Related projects:
+```sh
+npm ci
+```
 
-- [bitwarden/server](https://github.com/bitwarden/server): The core infrastructure backend (API, database, Docker, etc).
-- [bitwarden/ios](https://github.com/bitwarden/ios): Bitwarden iOS Password Manager & Authenticator apps.
-- [bitwarden/android](https://github.com/bitwarden/android): Bitwarden Android Password Manager & Authenticator apps.
-- [bitwarden/directory-connector](https://github.com/bitwarden/directory-connector): A tool for syncing a directory (AD, LDAP, Azure, G Suite, Okta) to an organization.
+Common commands (matching [`.github/workflows/ci.yml`](.github/workflows/ci.yml)):
 
-# We're Hiring!
+```sh
+# Production self-hosted OSS web vault build
+npm run build:oss:selfhost:prod --workspace apps/web
 
-Interested in contributing in a big way? Consider joining our team! We're hiring for many positions. Please take a look at our [Careers page](https://bitwarden.com/careers/) to see what opportunities are [currently open](https://bitwarden.com/careers/#open-positions) as well as what it's like to work at Bitwarden.
+# Development watch server (self-hosted OSS)
+npm run build:oss:selfhost:watch --workspace apps/web
 
-# Contribute
+# Lint and typecheck
+npm run lint
+npm run test:types
 
-Code contributions are welcome! Please commit any pull requests against the `main` branch. Learn more about how to contribute by reading the [Contributing Guidelines](https://contributing.bitwarden.com/contributing/). Check out the [Contributing Documentation](https://contributing.bitwarden.com/) for how to get started with your first contribution.
+# Run unit tests
+npm test -- apps/web --ci
+npm test -- libs --ci
+```
 
-Security audits and feedback are welcome. Please open an issue or email us privately if the report is sensitive in nature. You can read our security policy in the [`SECURITY.md`](SECURITY.md) file.
+For large builds or test runs, set `NODE_OPTIONS=--max-old-space-size=6144`.
+
+## Documentation
+
+- [docs/cipher-types.md](docs/cipher-types.md) — cipher type architecture reference across models, UI, and tests
+- [docs/using-nx-to-build-projects.md](docs/using-nx-to-build-projects.md) — Nx workspace build reference
+- [CONTRIBUTING.md](CONTRIBUTING.md) and the [Busnes.app shared contribution policy](https://github.com/Busnes-app/.github/blob/main/CONTRIBUTING.md)
+
+## Related Busnes.app repositories
+
+- [Busnes-app/KyVault-backend](https://github.com/Busnes-app/KyVault-backend) — AGPL-3.0 Vaultwarden fork providing the Bitwarden-compatible API server for KyVault
+
+## Upstream attribution and license
+
+`KyVault-web` is forked from [bitwarden/clients](https://github.com/bitwarden/clients) and carries the open-source self-hosted web vault (`apps/web` and shared `libs/`). Source code in this repository is licensed under the GNU General Public License v3.0 — see [LICENSE.txt](LICENSE.txt) and [LICENSE_GPL.txt](LICENSE_GPL.txt).
+
+**Not affiliated with or endorsed by Bitwarden, Inc.** Bitwarden trademarks remain the property of Bitwarden, Inc.
