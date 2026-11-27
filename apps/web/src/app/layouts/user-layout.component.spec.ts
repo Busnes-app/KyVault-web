@@ -27,6 +27,8 @@ import {
 
 import { PremiumSubscriptionRoutingService } from "../billing/individual/services/premium-subscription-routing.service";
 import { PamUserNavSlotComponent } from "../pam/user-nav-slot/pam-user-nav-slot.component";
+import { TenancyService, TenancyState } from "../tenancy/tenancy.service";
+import { recoveryUserId, tenancyStatus } from "../tenancy/tenancy.spec-util";
 
 import { UserLayoutComponent } from "./user-layout.component";
 import { WebLayoutModule } from "./web-layout.module";
@@ -93,6 +95,16 @@ Object.defineProperty(window, "matchMedia", {
 describe("UserLayoutComponent", () => {
   let fixture: ComponentFixture<UserLayoutComponent>;
 
+  const tenancy$ = new BehaviorSubject<TenancyState>({
+    kind: "unsupported",
+    userId: recoveryUserId,
+  });
+  const tenancyState = signal<TenancyState>(tenancy$.value);
+  const setTenancy = (state: TenancyState) => {
+    tenancy$.next(state);
+    tenancyState.set(state);
+  };
+
   const flag$ = new BehaviorSubject<boolean>(false);
   const viewModel$ = new BehaviorSubject<VaultsNavViewModel>(emptyViewModel);
 
@@ -152,6 +164,7 @@ describe("UserLayoutComponent", () => {
     );
 
   beforeEach(async () => {
+    setTenancy({ kind: "unsupported", userId: recoveryUserId });
     activeStepId.set(null);
     flag$.next(false);
     viewModel$.next(emptyViewModel);
@@ -175,6 +188,7 @@ describe("UserLayoutComponent", () => {
     await TestBed.configureTestingModule({
       imports: [UserLayoutComponent, RouterModule.forRoot([]), NavigationModule],
       providers: [
+        { provide: TenancyService, useValue: { state$: tenancy$, state: tenancyState } },
         { provide: I18nService, useValue: i18nService },
         { provide: ConfigService, useValue: configService },
         { provide: VaultNavService, useValue: vaultNavService },
@@ -214,6 +228,25 @@ describe("UserLayoutComponent", () => {
     fixture = TestBed.createComponent(UserLayoutComponent);
     fixture.detectChanges();
   });
+
+  it.each([false, true])(
+    "hides Sends in multi-tenant mode (new nav %s) and surfaces recovery",
+    (flag) => {
+      flag$.next(flag);
+      setTenancy({ kind: "ready", userId: recoveryUserId, status: tenancyStatus });
+      fixture.detectChanges();
+      expect(navText()).not.toContain("send");
+      expect(navText()).toContain("Set up recovery kit");
+      setTenancy({
+        kind: "ready",
+        userId: recoveryUserId,
+        status: { ...tenancyStatus, multiTenant: false },
+      });
+      fixture.detectChanges();
+      expect(navText()).toContain("send");
+      expect(navText()).not.toContain("Set up recovery kit");
+    },
+  );
 
   describe("flag off", () => {
     it("renders the current navigation unchanged", () => {

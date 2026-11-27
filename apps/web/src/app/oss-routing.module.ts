@@ -97,6 +97,7 @@ import { SMLandingComponent } from "./secrets-manager/secrets-manager-landing/sm
 import { AppearanceComponent } from "./settings/appearance.component";
 import { DomainRulesComponent } from "./settings/domain-rules.component";
 import { KySettingsLayoutComponent } from "./settings/ky-settings-layout.component";
+import { tenancyFeatureGuard } from "./tenancy/tenancy.guard";
 import { CredentialGeneratorComponent } from "./tools/credential-generator/credential-generator.component";
 import { unsavedSendEditsGuard } from "./tools/guards/unsaved-send-edits.guard";
 import { ImportShellWebComponent } from "./tools/import/import-shell-web.component";
@@ -692,6 +693,7 @@ const routes: Routes = [
         component: SendComponent,
         data: { titleId: "send" } satisfies RouteDataProperties,
         canActivate: [
+          tenancyFeatureGuard("allowSends"),
           organizationPolicyGuard((userId, policyService, configService) =>
             configService
               .getFeatureFlag$(FeatureFlag.SendControls)
@@ -777,6 +779,7 @@ const routes: Routes = [
           },
           {
             path: AuthWebRouteSegment.EmergencyAccess,
+            canActivateChild: [tenancyFeatureGuard("allowEmergencyAccess")],
             children: [
               {
                 path: "",

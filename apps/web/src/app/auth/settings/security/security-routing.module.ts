@@ -4,6 +4,7 @@ import { RouterModule, Routes } from "@angular/router";
 import { DeviceManagementComponent } from "@bitwarden/angular/auth/device-management/device-management.component";
 
 import { SessionTimeoutComponent } from "../../../key-management/session-timeout/session-timeout.component";
+import { PersonalRecoveryComponent } from "../../../tenancy/personal-recovery.component";
 import { TwoFactorSetupComponent } from "../two-factor/two-factor-setup.component";
 
 import { PasswordSettingsComponent } from "./password-settings/password-settings.component";
@@ -21,6 +22,11 @@ const routes: Routes = [
         path: "session-timeout",
         component: SessionTimeoutComponent,
         data: { titleId: "sessionTimeoutHeader" },
+      },
+      {
+        path: "personal-recovery",
+        component: PersonalRecoveryComponent,
+        data: { titleId: "security" },
       },
       {
         path: "password",
