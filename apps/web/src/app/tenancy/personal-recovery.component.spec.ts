@@ -2,13 +2,15 @@ import { signal } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { NoopAnimationsModule } from "@angular/platform-browser/animations";
 import { mock } from "jest-mock-extended";
-import { BehaviorSubject, of } from "rxjs";
+import { BehaviorSubject } from "rxjs";
 
+import { UserVerificationDialogComponent } from "@bitwarden/auth/angular";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { FileDownloadService } from "@bitwarden/common/platform/abstractions/file-download/file-download.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import { UserKey } from "@bitwarden/common/types/key";
+import { DialogService } from "@bitwarden/components";
 import { KeyService } from "@bitwarden/key-management";
 
 import { PersonalRecoveryPayload } from "./personal-recovery-crypto";
@@ -28,6 +30,11 @@ describe("PersonalRecoveryComponent", () => {
     userId: recoveryUserId,
     status: tenancyStatus,
   });
+  const dialogs = mock<DialogService>();
+  const account$ = new BehaviorSubject<{ id: typeof recoveryUserId } | null>({
+    id: recoveryUserId,
+  });
+  let verifyUser: jest.SpyInstance;
   const userKey$ = new BehaviorSubject<UserKey | null>(mock<UserKey>());
   const payload: PersonalRecoveryPayload = {
     version: 1,
@@ -44,7 +51,12 @@ describe("PersonalRecoveryComponent", () => {
   let component: PersonalRecoveryComponent;
 
   beforeEach(async () => {
+    jest.restoreAllMocks();
     jest.resetAllMocks();
+    account$.next({ id: recoveryUserId });
+    verifyUser = jest
+      .spyOn(UserVerificationDialogComponent, "open")
+      .mockResolvedValue({ userAction: "confirm", verificationSuccess: true });
     state.set({ kind: "ready", userId: recoveryUserId, status: tenancyStatus });
     userKey$.next(mock<UserKey>());
     keys.userKey$.mockReturnValue(userKey$);
@@ -58,13 +70,74 @@ describe("PersonalRecoveryComponent", () => {
         { provide: PlatformUtilsService, useValue: platform },
         { provide: FileDownloadService, useValue: downloads },
         { provide: KeyService, useValue: keys },
-        { provide: AccountService, useValue: { activeAccount$: of({ id: recoveryUserId }) } },
+        { provide: AccountService, useValue: { activeAccount$: account$ } },
+        { provide: DialogService, useValue: dialogs },
         { provide: I18nService, useValue: i18n },
       ],
     }).compileComponents();
     fixture = TestBed.createComponent(PersonalRecoveryComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  });
+
+  it.each([
+    { userAction: "cancel" as const, verificationSuccess: false },
+    { userAction: "confirm" as const, verificationSuccess: false },
+  ])("never prepares a kit without successful verification (%o)", async (result) => {
+    verifyUser.mockResolvedValue(result);
+    await component["prepare"]();
+    fixture.detectChanges();
+    expect(verifyUser).toHaveBeenCalledWith(dialogs, expect.anything());
+    expect(recovery.prepare).not.toHaveBeenCalled();
+    expect(component["pending"]()).toBeNull();
+    expect(fixture.nativeElement.textContent).not.toContain("offline-secret");
+  });
+
+  it("never prepares a kit when verification throws", async () => {
+    verifyUser.mockRejectedValue(new Error("verification failed"));
+    await component["prepare"]();
+    expect(recovery.prepare).not.toHaveBeenCalled();
+    expect(component["pending"]()).toBeNull();
+  });
+
+  it("verifies afresh for every kit and shows the secret only after success", async () => {
+    await component["prepare"]();
+    fixture.detectChanges();
+    expect(verifyUser).toHaveBeenCalledTimes(1);
+    expect(recovery.prepare).toHaveBeenCalledWith({
+      userId: recoveryUserId,
+      tenantId: tenancyStatus.tenantId,
+    });
+    expect(fixture.nativeElement.textContent).toContain("offline-secret");
+    await component["prepare"]();
+    expect(verifyUser).toHaveBeenCalledTimes(2);
+  });
+
+  it("drops a verification that completes after an account change", async () => {
+    let finish!: (value: { userAction: "confirm"; verificationSuccess: boolean }) => void;
+    verifyUser.mockReturnValue(
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+    );
+    const running = component["prepare"]();
+    account$.next(null);
+    finish({ userAction: "confirm", verificationSuccess: true });
+    await running;
+    expect(recovery.prepare).not.toHaveBeenCalled();
+    expect(component["pending"]()).toBeNull();
+  });
+
+  it("clears a pending kit on account change and on destroy", async () => {
+    await component["prepare"]();
+    expect(component["pending"]()?.secret).toBe("offline-secret");
+    account$.next(null);
+    expect(component["pending"]()).toBeNull();
+    account$.next({ id: recoveryUserId });
+    await component["prepare"]();
+    expect(component["pending"]()?.secret).toBe("offline-secret");
+    fixture.destroy();
+    expect(component["pending"]()).toBeNull();
   });
 
   it("requires offline acknowledgement before activation and offers copy/download", async () => {

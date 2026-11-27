@@ -10,6 +10,7 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormControl, ReactiveFormsModule } from "@angular/forms";
 import { distinctUntilChanged, map, of, switchMap } from "rxjs";
 
+import { UserVerificationDialogComponent } from "@bitwarden/auth/angular";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { FileDownloadService } from "@bitwarden/common/platform/abstractions/file-download/file-download.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
@@ -17,6 +18,7 @@ import { UserId } from "@bitwarden/common/types/guid";
 import {
   ButtonModule,
   CheckboxModule,
+  DialogService,
   FormControlModule,
   FormFieldModule,
   TypographyModule,
@@ -47,6 +49,7 @@ export class PersonalRecoveryComponent implements OnDestroy {
   private readonly downloads = inject(FileDownloadService);
   private readonly accounts = inject(AccountService);
   private readonly keys = inject(KeyService);
+  private readonly dialogs = inject(DialogService);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly pending = signal<{ secret: string; payload: PersonalRecoveryPayload } | null>(
     null,
@@ -126,6 +129,11 @@ export class PersonalRecoveryComponent implements OnDestroy {
 
   protected prepare(): Promise<void> {
     return this.run(async (context, generation) => {
+      // Fresh verification for every kit: it exports decryption material, like vault export.
+      const { verificationSuccess } = await UserVerificationDialogComponent.open(this.dialogs, {});
+      if (!verificationSuccess || generation !== this.generation()) {
+        return;
+      }
       const prepared = await this.recovery.prepare(context);
       if (generation === this.generation()) {
         this.pending.set(prepared);
