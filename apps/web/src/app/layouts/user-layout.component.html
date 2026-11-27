@@ -73,6 +73,18 @@
       ></bit-nav-item>
       <vault-coachmark #reportsCoachmark stepId="monitorSecurity" />
     }
+    @let tenancyState = tenancy.state();
+    @if (
+      tenancyState.kind === "ready" &&
+      tenancyState.status.multiTenant &&
+      !tenancyState.status.recovery.hasPersonalRecoveryKit
+    ) {
+      <bit-nav-item
+        icon="bwi-key"
+        text="Set up recovery kit"
+        route="settings/security/personal-recovery"
+      ></bit-nav-item>
+    }
   </app-side-nav>
 
   <router-outlet></router-outlet>

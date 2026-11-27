@@ -1,0 +1,142 @@
+<section aria-labelledby="personal-recovery-title" class="tw-max-w-3xl tw-py-6">
+  <h2 bitTypography="h2" id="personal-recovery-title">Personal Recovery Kit</h2>
+  <p bitTypography="body1">
+    Keep a recovery secret offline to protect access to your vault key. Your browser encrypts the
+    keys before upload. The server stores only client-encrypted ciphertext: there is no server
+    escrow and no organisation-admin escrow. Neither can recover your vault for you.
+  </p>
+  @let state = tenancy.state();
+  @if (state.kind === "loading") {
+    <p role="status">Loading recovery status…</p>
+  } @else if (state.kind !== "ready") {
+    <p role="status">Personal Recovery Kits are unavailable on this server.</p>
+    @if (state.kind === "unavailable") {
+      <button bitButton type="button" buttonType="secondary" (click)="tenancy.refresh()">
+        Retry
+      </button>
+    }
+  } @else if (!unlocked()) {
+    <p role="status">Unlock your vault to manage your recovery kit.</p>
+  } @else {
+    <p bitTypography="body1">
+      {{
+        state.status.recovery.hasPersonalRecoveryKit
+          ? "An active recovery kit is stored."
+          : "You have no active recovery kit."
+      }}
+      A kit protects the current key; create a new kit after changing your vault encryption key.
+    </p>
+    @if (pending(); as kit) {
+      <h3 bitTypography="h3">Save your new recovery secret</h3>
+      <p bitTypography="body1">
+        This secret is shown only now. Save or print it somewhere safe outside your vault. Anyone
+        with it and the encrypted bundle can recover your vault key. The old kit stays active until
+        you activate this one.
+      </p>
+      <p class="tw-font-mono tw-break-all tw-select-all tw-py-4" aria-label="New recovery secret">
+        {{ kit.secret }}
+      </p>
+      <div class="tw-flex tw-flex-wrap tw-gap-3 tw-mb-4">
+        <button bitButton type="button" buttonType="secondary" (click)="copy()" [disabled]="busy()">
+          Copy secret
+        </button>
+        <button
+          bitButton
+          type="button"
+          buttonType="secondary"
+          (click)="download()"
+          [disabled]="busy()"
+        >
+          Download printable kit
+        </button>
+      </div>
+      <bit-form-control>
+        <input bitCheckbox type="checkbox" [formControl]="savedOffline" />
+        <bit-label>I saved this secret securely outside my vault.</bit-label>
+      </bit-form-control>
+      <div class="tw-flex tw-flex-wrap tw-gap-3 tw-mt-4">
+        <button
+          bitButton
+          type="button"
+          buttonType="primary"
+          (click)="activate()"
+          [disabled]="busy() || !savedOffline.value"
+        >
+          Activate new kit
+        </button>
+        <button
+          bitButton
+          type="button"
+          buttonType="secondary"
+          (click)="clearSecrets()"
+          [disabled]="busy()"
+        >
+          Cancel
+        </button>
+      </div>
+    } @else {
+      <button bitButton type="button" buttonType="primary" (click)="prepare()" [disabled]="busy()">
+        {{
+          state.status.recovery.hasPersonalRecoveryKit
+            ? "Rotate recovery kit"
+            : "Create recovery kit"
+        }}
+      </button>
+      @if (state.status.recovery.hasPersonalRecoveryKit) {
+        <h3 bitTypography="h3" class="tw-mt-8">Test your recovery key</h3>
+        <p bitTypography="body1">
+          Testing happens entirely in this browser. Your secret is never uploaded.
+        </p>
+        <form (ngSubmit)="verify()">
+          <bit-form-field>
+            <bit-label>Recovery secret</bit-label>
+            <input
+              bitInput
+              type="password"
+              [formControl]="testSecret"
+              autocomplete="off"
+              spellcheck="false"
+              maxlength="128"
+            />
+          </bit-form-field>
+          <button
+            bitButton
+            type="submit"
+            buttonType="secondary"
+            [disabled]="busy() || !testSecret.value"
+          >
+            Verify locally
+          </button>
+        </form>
+        <h3 bitTypography="h3" class="tw-mt-8">Revoke recovery kit</h3>
+        <p bitTypography="body1">
+          This deletes the active encrypted bundle from this server. It cannot erase copies already
+          downloaded.
+        </p>
+        <bit-form-control>
+          <input bitCheckbox type="checkbox" [formControl]="confirmRevoke" />
+          <bit-label>I understand this removes my active recovery option.</bit-label>
+        </bit-form-control>
+        <button
+          bitButton
+          type="button"
+          buttonType="danger"
+          class="tw-mt-4"
+          (click)="revoke()"
+          [disabled]="busy() || !confirmRevoke.value"
+        >
+          Revoke recovery kit
+        </button>
+      }
+    }
+  }
+  @if (busy()) {
+    <p role="status" class="tw-mt-4">Working…</p>
+  }
+  @if (message()) {
+    <p role="status" class="tw-mt-4">{{ message() }}</p>
+  }
+  @if (error()) {
+    <p role="alert" class="tw-text-danger tw-mt-4">{{ error() }}</p>
+  }
+</section>

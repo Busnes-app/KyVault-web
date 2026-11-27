@@ -4,7 +4,7 @@ import { CommonModule } from "@angular/common";
 import { Component, computed, inject, OnInit, Signal } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { RouterModule } from "@angular/router";
-import { map, Observable, switchMap } from "rxjs";
+import { combineLatest, map, Observable, switchMap } from "rxjs";
 
 import { PasswordManagerLogo } from "@bitwarden/assets/svg";
 import {
@@ -29,6 +29,7 @@ import {
 import { PremiumSubscriptionRoutingService } from "@bitwarden/web-vault/app/billing/individual/services/premium-subscription-routing.service";
 
 import { PamUserNavSlotComponent } from "../pam/user-nav-slot/pam-user-nav-slot.component";
+import { TenancyService, tenancyAllows } from "../tenancy/tenancy.service";
 
 import { WebLayoutModule } from "./web-layout.module";
 
@@ -53,10 +54,13 @@ import { WebLayoutModule } from "./web-layout.module";
 export class UserLayoutComponent implements OnInit {
   protected readonly logo = PasswordManagerLogo;
   protected readonly showEmergencyAccess: Signal<boolean>;
-  protected readonly sendEnabled$: Observable<boolean> = this.sendPolicyService.disableSend$.pipe(
-    map((disableSend) => !disableSend),
-  );
+  protected readonly sendEnabled$: Observable<boolean> = combineLatest([
+    this.sendPolicyService.disableSend$,
+    inject(TenancyService).state$,
+  ]).pipe(map(([disableSend, state]) => !disableSend && tenancyAllows(state, "allowSends")));
   protected subscriptionRoute$: Observable<string | null>;
+
+  protected readonly tenancy = inject(TenancyService);
 
   protected readonly coachmarkService = inject(CoachmarkService);
   protected readonly sideNavService = inject(SideNavService);
@@ -103,7 +107,13 @@ export class UserLayoutComponent implements OnInit {
     this.showEmergencyAccess = toSignal(
       this.accountService.activeAccount$.pipe(
         getUserId,
-        switchMap((userId) => canAccessEmergencyAccess(userId, this.policyService)),
+        switchMap((userId) =>
+          combineLatest([
+            canAccessEmergencyAccess(userId, this.policyService),
+            this.tenancy.state$,
+          ]),
+        ),
+        map(([allowed, state]) => allowed && tenancyAllows(state, "allowEmergencyAccess")),
       ),
     );
 

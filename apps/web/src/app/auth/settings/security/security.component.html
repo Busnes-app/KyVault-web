@@ -17,6 +17,9 @@
     <bit-tab-link route="two-factor">{{ "twoStepLogin" | i18n }}</bit-tab-link>
     <bit-tab-link route="device-management">{{ "devices" | i18n }}</bit-tab-link>
     <bit-tab-link route="security-keys">{{ "keys" | i18n }}</bit-tab-link>
+    @if (tenancy.state().kind === "ready") {
+      <bit-tab-link route="personal-recovery">Personal Recovery Kit</bit-tab-link>
+    }
   </bit-tab-nav-bar>
 </app-header>
 

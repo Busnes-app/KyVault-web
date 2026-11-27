@@ -2,7 +2,7 @@ import { AsyncPipe } from "@angular/common";
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
-import { map, switchMap } from "rxjs";
+import { combineLatest, map, switchMap } from "rxjs";
 
 import { canAccessEmergencyAccess } from "@bitwarden/common/admin-console/abstractions/organization/organization.service.abstraction";
 import { PolicyService } from "@bitwarden/common/admin-console/abstractions/policy/policy.service.abstraction";
@@ -16,10 +16,13 @@ import { I18nPipe } from "@bitwarden/ui-common";
 import { LockService, LockSource } from "@bitwarden/unlock";
 import { PremiumSubscriptionRoutingService } from "@bitwarden/web-vault/app/billing/individual/services/premium-subscription-routing.service";
 
+import { TenancyService, tenancyAllows } from "../tenancy/tenancy.service";
+import { TenantStatusComponent } from "../tenancy/tenant-status.component";
+
 @Component({
   selector: "ky-settings-layout",
   standalone: true,
-  imports: [AsyncPipe, I18nPipe, RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [AsyncPipe, I18nPipe, RouterLink, RouterLinkActive, RouterOutlet, TenantStatusComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="ky-settings-shell">
@@ -97,11 +100,13 @@ import { PremiumSubscriptionRoutingService } from "@bitwarden/web-vault/app/bill
         }
       </nav>
 
+      <ky-tenant-status />
       <router-outlet></router-outlet>
     </div>
   `,
 })
 export class KySettingsLayoutComponent {
+  private readonly tenancy = inject(TenancyService);
   private readonly accountService = inject(AccountService);
   private readonly policyService = inject(PolicyService);
   private readonly vaultTimeoutSettingsService = inject(VaultTimeoutSettingsService);
@@ -113,7 +118,10 @@ export class KySettingsLayoutComponent {
   protected readonly showEmergencyAccess = toSignal(
     this.accountService.activeAccount$.pipe(
       getUserId,
-      switchMap((userId) => canAccessEmergencyAccess(userId, this.policyService)),
+      switchMap((userId) =>
+        combineLatest([canAccessEmergencyAccess(userId, this.policyService), this.tenancy.state$]),
+      ),
+      map(([allowed, state]) => allowed && tenancyAllows(state, "allowEmergencyAccess")),
     ),
     { initialValue: false },
   );
