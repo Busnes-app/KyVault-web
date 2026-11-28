@@ -60,6 +60,7 @@ import { AuthRequestAnsweringService } from "@bitwarden/common/auth/abstractions
 import { AuthService } from "@bitwarden/common/auth/abstractions/auth.service";
 import { MasterPasswordApiService } from "@bitwarden/common/auth/abstractions/master-password-api.service.abstraction";
 import { SsoLoginServiceAbstraction } from "@bitwarden/common/auth/abstractions/sso-login.service.abstraction";
+import { TokenService } from "@bitwarden/common/auth/abstractions/token.service";
 import { WebAuthnLoginPrfKeyServiceAbstraction } from "@bitwarden/common/auth/abstractions/webauthn/webauthn-login-prf-key.service.abstraction";
 import { DeepLinkRedirectService } from "@bitwarden/common/auth/deep-link-redirect";
 import {
@@ -109,6 +110,7 @@ import { SystemService } from "@bitwarden/common/platform/abstractions/system.se
 import { IpcService } from "@bitwarden/common/platform/ipc";
 // eslint-disable-next-line no-restricted-imports -- Needed for DI
 import {
+  SignalRConnectionService,
   UnsupportedWebPushConnectionService,
   WebPushConnectionService,
 } from "@bitwarden/common/platform/server-notifications/internal";
@@ -209,6 +211,7 @@ import { WebMigrationRunner } from "../platform/web-migration-runner";
 import { WebSdkLoadService } from "../platform/web-sdk-load.service";
 import { WebStorageServiceProvider } from "../platform/web-storage-service.provider";
 import { WebSystemService } from "../platform/web-system.service";
+import { ExportOnlySignalRConnectionService, exportOnlyFetchGate } from "../tenancy/export-only";
 
 import { InitService } from "./init.service";
 import { ENV_URLS } from "./injection-tokens";
@@ -268,6 +271,18 @@ const safeProviders: SafeProvider[] = [
     useFactory: (initService: InitService) => initService.init(),
     deps: [InitService],
     multi: true,
+  }),
+  // KyVault export-only sessions: no authenticated request but the export, and no hub.
+  safeProvider({
+    provide: APP_INITIALIZER as SafeInjectionToken<() => void>,
+    useFactory: (api: ApiService) => () => api.addMiddleware(exportOnlyFetchGate()),
+    deps: [ApiService],
+    multi: true,
+  }),
+  safeProvider({
+    provide: SignalRConnectionService,
+    useClass: ExportOnlySignalRConnectionService,
+    deps: [TokenService, ApiService, LogService, PlatformUtilsService],
   }),
   // Web-only automation capability.
   safeProvider({

@@ -27,6 +27,7 @@ import {
   VaultIcon,
   SsoKeyIcon,
   LockIcon,
+  DeactivatedOrg,
   BrowserExtensionIcon,
   ActiveSendIcon,
   TwoFactorAuthAuthenticatorIcon,
@@ -97,6 +98,12 @@ import { SMLandingComponent } from "./secrets-manager/secrets-manager-landing/sm
 import { AppearanceComponent } from "./settings/appearance.component";
 import { DomainRulesComponent } from "./settings/domain-rules.component";
 import { KySettingsLayoutComponent } from "./settings/ky-settings-layout.component";
+import {
+  EXPORT_ROUTE,
+  exportOnlyRedirectGuard,
+  exportOnlySessionGuard,
+} from "./tenancy/export-only";
+import { RestrictedExportComponent } from "./tenancy/restricted-export.component";
 import { tenancyFeatureGuard } from "./tenancy/tenancy.guard";
 import { CredentialGeneratorComponent } from "./tools/credential-generator/credential-generator.component";
 import { unsavedSendEditsGuard } from "./tools/guards/unsaved-send-edits.guard";
@@ -440,8 +447,17 @@ const routes: Routes = [
         } satisfies RouteDataProperties & AnonLayoutWrapperData,
       },
       {
+        path: EXPORT_ROUTE,
+        canActivate: [exportOnlySessionGuard],
+        component: RestrictedExportComponent,
+        data: {
+          pageTitle: "Download your vault",
+          pageIcon: DeactivatedOrg,
+        } satisfies AnonLayoutWrapperData,
+      },
+      {
         path: "lock",
-        canActivate: [lockGuard()],
+        canActivate: [exportOnlyRedirectGuard, lockGuard()],
         children: [
           {
             path: "",

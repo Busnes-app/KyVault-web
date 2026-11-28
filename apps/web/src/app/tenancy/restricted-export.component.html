@@ -1,0 +1,82 @@
+<section aria-labelledby="restricted-export-title" class="tw-text-left">
+  <h2 bitTypography="h3" id="restricted-export-title">
+    Your organisation is scheduled for deletion
+  </h2>
+  <p bitTypography="body1">
+    You can still download your vault before it is deleted. This export holds only your own personal
+    items and folders. Organisation items are not included.
+  </p>
+
+  @if (!unlocked()) {
+    <form [formGroup]="form" (ngSubmit)="unlock()">
+      <p bitTypography="body1">
+        Signed in as {{ account()?.email }}. Enter your master password to unlock your export. It is
+        checked in this browser and never sent to the server.
+      </p>
+      <bit-form-field>
+        <bit-label>Master password</bit-label>
+        <input
+          bitInput
+          type="password"
+          autocomplete="current-password"
+          formControlName="password"
+          required
+        />
+      </bit-form-field>
+      <div class="tw-flex tw-flex-wrap tw-gap-3">
+        <button bitButton type="submit" buttonType="primary" [disabled]="busy() || !password.value">
+          Unlock export
+        </button>
+        <button bitButton type="button" buttonType="secondary" (click)="signOut()">Sign out</button>
+      </div>
+    </form>
+  } @else {
+    <h3 bitTypography="h4">Encrypted export</h3>
+    <p bitTypography="body1">
+      Your items exactly as the server holds them, still encrypted with your account key. Keep this
+      copy as your backup.
+    </p>
+    <button
+      bitButton
+      type="button"
+      buttonType="primary"
+      (click)="downloadEncrypted()"
+      [disabled]="busy()"
+    >
+      Download encrypted export
+    </button>
+
+    <h3 bitTypography="h4" class="tw-mt-6">Unencrypted export</h3>
+    <p bitTypography="body1">
+      A standard JSON vault export that another password manager can import. Your browser decrypts
+      it; nothing is sent to the server.
+    </p>
+    <p bitTypography="body1" class="tw-text-danger">
+      This export contains your vault data in an unencrypted format. You should not store or send
+      the exported file over insecure channels (such as email). Delete it immediately after you are
+      done using it.
+    </p>
+    <div class="tw-flex tw-flex-wrap tw-gap-3">
+      <button
+        bitButton
+        type="button"
+        buttonType="secondary"
+        (click)="downloadDecrypted()"
+        [disabled]="busy()"
+      >
+        Download unencrypted export
+      </button>
+      <button bitButton type="button" buttonType="secondary" (click)="signOut()">Sign out</button>
+    </div>
+  }
+
+  @if (busy()) {
+    <p role="status" class="tw-mt-4">Working…</p>
+  }
+  @if (message()) {
+    <p role="status" class="tw-mt-4">{{ message() }}</p>
+  }
+  @if (error()) {
+    <p role="alert" class="tw-mt-4 tw-text-danger">{{ error() }}</p>
+  }
+</section>
