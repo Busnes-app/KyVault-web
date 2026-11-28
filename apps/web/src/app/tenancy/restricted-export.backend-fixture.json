@@ -1,0 +1,43 @@
+{
+  "ciphers": [
+    {
+      "archivedDate": null,
+      "attachments": null,
+      "bankAccount": null,
+      "card": null,
+      "collectionIds": [],
+      "creationDate": "2026-11-28T07:24:08.847958Z",
+      "deletedDate": null,
+      "driversLicense": null,
+      "edit": true,
+      "favorite": false,
+      "fields": [],
+      "folderId": null,
+      "id": "c1a1281a-e1a7-4c24-ae55-1d8a9800631e",
+      "identity": null,
+      "key": null,
+      "login": null,
+      "name": "2.Q3fVv8OkeqDpxPNn+o4nXw==|hIEeDCW12hva7z7XqR+8zAwP9Da652yvXGT1kK9VZ7c=|RgaVB1lbgtewatxPVw+/U5GnQBamaYafNfVyeK/Kw8w=",
+      "notes": null,
+      "object": "cipherDetails",
+      "organizationId": null,
+      "organizationUseTotp": true,
+      "passport": null,
+      "passwordHistory": [],
+      "permissions": { "delete": true, "restore": true },
+      "reprompt": 0,
+      "revisionDate": "2026-11-28T07:24:08.848291Z",
+      "secureNote": { "type": 0 },
+      "sshKey": null,
+      "type": 2,
+      "viewPassword": true
+    }
+  ],
+  "email": "alice@e2e.test",
+  "folders": [],
+  "kdf": { "iterations": 600000, "kdfType": 0, "memory": null, "parallelism": null },
+  "key": "2.LmJyT3z0ddSgOphQ91ahWA==|3T/b/R80LHDOI0/VIwu9H8eG6yhHtN0tljAdGq/1zDZeNGdRp0C9PMoPkv4NgzIr6OIPoQ+DqQnG+vcJUC4/deF0caTVnfXCCqRc+6Bt0Xc=|zbzSsMeUeKgN2P/aNmEvCQGXVJvDiJ14gbeMrHJbwdU=",
+  "object": "kyvaultRestrictedExport",
+  "privateKey": "2.EciAMKrI6z18ockg5S9LIw==|jNlnFXBpoVrBVyEHK2XnIH7t7Nbo94hkEOH+Emq4vJn7tBd6otnPK3we/BMRFaxNCFAhGliYuytD7eTDG9y3PiEnf1vqraMare324Hs7jJKmV4Eu9NEuReH3Bd5m66VkcHCZ5/vdU2sgyHXrQYnkusbnRX5PY1fIWpWwHwX58gPyFwMLMafqoLejMw+x2w3Bsgsv/Sfo6/Q7Wn5G+NrqXoCsXKwWqJnkUbVlT6zcPM7AstsCVlgB4FOh4kZz3lyLIH6eJNPMFXR21p5v3I0emQqNiUC6M3tIhLy+Fq7jss/zCMLTw/BipcjggXVLP16xoI3Q/pW4gIRzb8aXOgpTjpl7GdI1+YkYu83OGo0EDg4CWQohXG0JxhVTWQQlo8rxFG+UlZ3byRlhqRqQ629GwLPXtZHuYmsZ30McIfehqjZnwFRual4t5aTDrPYDZ4Z0Nez834A12Ng26vd++CwGs2/kssPqRZwrmEnnHtBhx9Zmw1khMfZy+qAR4OD8Wg1UKLs+4Yu+RsDOC4htJa8Y+yG7AW2B5nZ84arn6nMEifbC8xiKKmMcJqzbiBlPZ+i68qdR1iTo/EFW5khNIA/pfE8X6OH3drpJpKwQ54FO6WxFtx1LkFFlqZ+oL6SgEvG9ofaQ0pWK/wHxZG+oD2I9wFttiU0XOobL9CUzG3bYsYttZmdJk8EWhKoc5P/EUF+7ENPKlBpHs5heAHA97xcy953mON9ILKVKERTYFNEvD/TUOQY52Vh4t0doLK25F8br7yEYn0YPfUxaLnQqG4YhbkhKtaRvyyKGmjv1Ob18jiqyaHZfypq51zZAts3yEKLEyJbYioaGIFVLH/X2DfS9QZ6vhednKxqS+E4FHCUiWIDOj9B4imuiJ+SFtoXXC1379srp03zdDjDLrjScNnX19UvasvIIo5i2Q9HRzzgoPgKNq9vTZN2ILkweKg7uEBOaCd/c9gD91zLayvera1CwTk6SvlKrqQ6PljXhCYdhwM1kZ/QyHxvS77cfcasynBXRlkAd8OeG0kKArJNaASbZpM/X5GtKkr7A3kT0JV3hG7YLK9JyWVsm/I9DYu+zcn6QWa2hFzTcZ/5Xdjpa61MtSTh2dQhSrJ8lS879K41llpFRhvorbPkOymDT6gukyO8V3h5+oUu0wf9vyl4hpfHwHMqSvegNLD5IhISG859INCpv38a1t/hLbCWaUfRFvAYA0NESni0kiOzUiKRfMjLkVO5DCiBC1OX3LjC3WGUmZpNbOpCMZgFbrj2rR42DWYDlTTGvaTkUKs2O7pWwEhVtrZ70XkNgDSHWDEqxo/k5vWgYJ6YdayD6UgEma32+qgITzgbuJrAMC3CvXvNwTgMLZ6ttHSgztKbIn7zO3h/6BGEgv59QImcDuS48kqknGw/0+V3aORBr2bIHmF4mBQ0tgOENIfUHYE6QI27O6LSuz+QsLr5KxXXF/VdDvT5AOHEpcooHxxVU/arjmlNaA+FKlcoeNazA+wSywaEu94f9vziR/z7oScsakC7mBwsR/3mYDaIMjVe9XYzH02HCQHnJVpc3jgqDZWAmxbZ7UKnspBXHVqTKn2w58AEBd/3Zri/F3iSiemMwtO5aaF8SYQcV4z+YjH37vCb5PG4ptM39IWc=|GKsWefHsZ3yOC/6WBqt2RL3JTuOspGXnaHMju6g8wak=",
+  "userId": "1e74d27c-8366-4d7f-9fab-651f69eb2bd7"
+}
