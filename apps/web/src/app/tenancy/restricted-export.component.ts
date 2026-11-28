@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  NgZone,
   OnDestroy,
   computed,
   inject,
@@ -14,8 +15,10 @@ import { firstValueFrom } from "rxjs";
 import { LogoutService } from "@bitwarden/auth/common";
 import { ApiService } from "@bitwarden/common/abstractions/api.service";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
+import { VaultTimeoutSettingsService } from "@bitwarden/common/key-management/vault-timeout";
 import { FileDownloadService } from "@bitwarden/common/platform/abstractions/file-download/file-download.service";
 import { SdkClientFactory } from "@bitwarden/common/platform/abstractions/sdk/sdk-client-factory";
+import { UserId } from "@bitwarden/common/types/guid";
 import {
   ButtonModule,
   DialogService,
@@ -23,6 +26,7 @@ import {
   TypographyModule,
 } from "@bitwarden/components";
 import { ManagedSettingsService } from "@bitwarden/managed-settings";
+import { PasswordManagerClient } from "@bitwarden/sdk-internal";
 import { ExportHelper } from "@bitwarden/vault-export-core";
 
 import { EXPORT_PATH } from "./export-only";
@@ -49,6 +53,9 @@ export class RestrictedExportComponent implements OnDestroy {
   private readonly router = inject(Router);
   private readonly sdkClients = inject(SdkClientFactory);
   private readonly managedSettings = inject(ManagedSettingsService);
+  private readonly timeouts = inject(VaultTimeoutSettingsService);
+  private readonly zone = inject(NgZone);
+  private readonly expiry = { timer: undefined as ReturnType<typeof setTimeout> | undefined };
 
   protected readonly account = toSignal(this.accounts.activeAccount$);
   protected readonly form = new FormGroup({
@@ -88,7 +95,21 @@ export class RestrictedExportComponent implements OnDestroy {
         return;
       }
       try {
+        const lockAfter = await this.lockAfterMs(account.id);
         this.opened.set({ data, userKey: unlockRestrictedExport(data, password) });
+        // The vault timeout does not see this screen (the account stays locked): apply it here.
+        // Outside the zone, so a long timer does not hold the app unstable.
+        this.expiry.timer = this.zone.runOutsideAngular(() =>
+          setTimeout(
+            () =>
+              this.zone.run(() => {
+                this.clear();
+                this.message.set("");
+                this.error.set("Your export locked again. Enter your master password to continue.");
+              }),
+            lockAfter,
+          ),
+        );
       } catch {
         this.error.set("That master password did not unlock your export.");
       }
@@ -123,13 +144,17 @@ export class RestrictedExportComponent implements OnDestroy {
     this.busy.set(true);
     this.error.set("");
     this.message.set("");
-    const client = await this.sdkClients.createSdkClient(
-      { get_access_token: () => Promise.resolve(undefined) },
-      null,
-      await firstValueFrom(this.managedSettings.client$),
-    );
+    let client: PasswordManagerClient | undefined;
     try {
+      client = await this.sdkClients.createSdkClient(
+        { get_access_token: () => Promise.resolve(undefined) },
+        null,
+        await firstValueFrom(this.managedSettings.client$),
+      );
       const { json, failed } = await decryptRestrictedExport(opened.data, opened.userKey, client);
+      if (this.opened() !== opened) {
+        return; // Locked or signed out meanwhile.
+      }
       this.save(json, ExportHelper.getFileName("", "json"));
       this.message.set(
         failed === 0
@@ -139,7 +164,7 @@ export class RestrictedExportComponent implements OnDestroy {
     } catch {
       this.error.set("Your export could not be decrypted. Download the encrypted export instead.");
     } finally {
-      client.free();
+      client?.free();
       this.busy.set(false);
     }
   }
@@ -153,7 +178,18 @@ export class RestrictedExportComponent implements OnDestroy {
     await this.router.navigate(["/"]);
   }
 
+  /** The configured vault timeout; web's default 15 minutes when it is not a number. */
+  private async lockAfterMs(userId: UserId): Promise<number> {
+    try {
+      const timeout = await firstValueFrom(this.timeouts.getVaultTimeoutByUserId$(userId));
+      return Math.max(1, typeof timeout === "number" ? timeout : 15) * 60_000;
+    } catch {
+      return 15 * 60_000;
+    }
+  }
+
   private clear(): void {
+    clearTimeout(this.expiry.timer);
     this.opened()?.userKey.fill(0);
     this.opened.set(null);
     this.password.reset();

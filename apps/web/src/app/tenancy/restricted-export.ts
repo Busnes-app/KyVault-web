@@ -112,7 +112,8 @@ export async function decryptRestrictedExport(
     }
     const cipher = new CipherWithIdExport();
     cipher.build(view);
-    cipher.collectionIds = null;
+    // As the stock export: `null`, not an empty list.
+    cipher.collectionIds = null as unknown as string[];
     delete cipher.key;
     doc.items.push(cipher);
   }

@@ -8,6 +8,7 @@ import { LogoutService } from "@bitwarden/auth/common";
 import { ApiService } from "@bitwarden/common/abstractions/api.service";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { FileDownloadService } from "@bitwarden/common/platform/abstractions/file-download/file-download.service";
+import { VaultTimeoutSettingsService } from "@bitwarden/common/key-management/vault-timeout";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { SdkClientFactory } from "@bitwarden/common/platform/abstractions/sdk/sdk-client-factory";
 import { UserId } from "@bitwarden/common/types/guid";
@@ -32,6 +33,7 @@ describe("RestrictedExportComponent", () => {
   const logout = mock<LogoutService>();
   const sdkClients = mock<SdkClientFactory>();
   const i18n = mock<I18nService>();
+  const timeouts = mock<VaultTimeoutSettingsService>();
   const account$ = new BehaviorSubject({ id: userId, email });
   let fixture: ComponentFixture<RestrictedExportComponent>;
   let component: RestrictedExportComponent;
@@ -56,6 +58,7 @@ describe("RestrictedExportComponent", () => {
   beforeEach(async () => {
     jest.resetAllMocks();
     i18n.t.mockImplementation((key) => key);
+    timeouts.getVaultTimeoutByUserId$.mockReturnValue(of(1));
     api.send.mockResolvedValue(JSON.parse(JSON.stringify(data)));
     sdkClients.createSdkClient.mockImplementation(() => Promise.resolve(newSdkClient()));
     await TestBed.configureTestingModule({
@@ -73,6 +76,7 @@ describe("RestrictedExportComponent", () => {
           useValue: { client$: of(new ManagedSettingsClient()) },
         },
         { provide: I18nService, useValue: i18n },
+        { provide: VaultTimeoutSettingsService, useValue: timeouts },
       ],
     }).compileComponents();
     fixture = TestBed.createComponent(RestrictedExportComponent);
@@ -141,5 +145,55 @@ describe("RestrictedExportComponent", () => {
     expect(key.every((byte) => byte === 0)).toBe(true);
     expect(component["opened"]()).toBeNull();
     expect(logout.logout).toHaveBeenCalledWith(userId, "userInitiated");
+  });
+
+  it("locks the export again after the vault timeout", async () => {
+    jest.useFakeTimers({ doNotFake: ["nextTick", "setImmediate", "queueMicrotask"] });
+    try {
+      await enterPassword(password);
+      const key = component["opened"]()!.userKey;
+      expect(timeouts.getVaultTimeoutByUserId$).toHaveBeenCalledWith(userId);
+
+      jest.advanceTimersByTime(59_000);
+      expect(component["opened"]()).not.toBeNull();
+      jest.advanceTimersByTime(1_000);
+      fixture.detectChanges();
+
+      expect(key.every((byte) => byte === 0)).toBe(true);
+      expect(component["opened"]()).toBeNull();
+      dialogs.openSimpleDialog.mockResolvedValue(true);
+      await component["downloadDecrypted"]();
+      component["downloadEncrypted"]();
+      expect(downloads.download).not.toHaveBeenCalled();
+      expect(page().querySelector("input[type=password]")).not.toBeNull();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("uses 15 minutes when the vault timeout is not a number", async () => {
+    jest.useFakeTimers({ doNotFake: ["nextTick", "setImmediate", "queueMicrotask"] });
+    try {
+      timeouts.getVaultTimeoutByUserId$.mockReturnValue(of("never" as const));
+      await enterPassword(password);
+      jest.advanceTimersByTime(15 * 60_000 - 1);
+      expect(component["opened"]()).not.toBeNull();
+      jest.advanceTimersByTime(1);
+      expect(component["opened"]()).toBeNull();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("recovers when the SDK client cannot start", async () => {
+    await enterPassword(password);
+    dialogs.openSimpleDialog.mockResolvedValue(true);
+    sdkClients.createSdkClient.mockRejectedValue(new Error("no sdk"));
+
+    await component["downloadDecrypted"]();
+
+    expect(component["busy"]()).toBe(false);
+    expect(component["error"]()).toContain("could not be decrypted");
+    expect(downloads.download).not.toHaveBeenCalled();
   });
 });
